@@ -4,7 +4,7 @@
   "description": "WE-FORM - Application Métier pour la gestion du parcours stagiaire en alternance",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -H 0.0.0.0",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
