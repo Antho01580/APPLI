@@ -1,0 +1,49 @@
+{
+  "name": "weform-app",
+  "version": "1.0.0",
+  "description": "WE-FORM - Application Métier pour la gestion du parcours stagiaire en alternance",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "db:migrate": "npx prisma migrate dev",
+    "db:seed": "npx tsx prisma/seed.ts",
+    "db:studio": "npx prisma studio",
+    "db:generate": "npx prisma generate",
+    "db:reset": "npx prisma migrate reset --force && npx tsx prisma/seed.ts",
+    "setup": "npm install && npx prisma migrate dev && npx tsx prisma/seed.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://local_proxy@127.0.0.1:39229/git/Antho01580/APPLI"
+  },
+  "dependencies": {
+    "@prisma/adapter-better-sqlite3": "^7.5.0",
+    "@prisma/client": "^7.5.0",
+    "@types/better-sqlite3": "^7.6.13",
+    "autoprefixer": "^10.4.27",
+    "bcryptjs": "^3.0.3",
+    "better-sqlite3": "^12.8.0",
+    "date-fns": "^4.1.0",
+    "dotenv": "^17.3.1",
+    "next": "^14.2.35",
+    "next-auth": "^4.24.13",
+    "postcss": "^8.5.8",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tailwindcss": "^3.4.19",
+    "uuid": "^13.0.0",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^25.5.0",
+    "@types/react": "^19.2.14",
+    "@types/uuid": "^10.0.0",
+    "prisma": "^7.5.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}

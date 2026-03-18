@@ -1,0 +1,694 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// ============ USERS & AUTH ============
+
+model User {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  password      String
+  nom           String
+  prenom        String
+  telephone     String?
+  photo         String?
+  role          String   // ADMIN, FORMATEUR, STAGIAIRE, TUTEUR
+  isActive      Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  stagiaire     Stagiaire?
+  formateur     Formateur?
+  tuteur        Tuteur?
+
+  sentMessages     Message[]      @relation("MessageSender")
+  receivedMessages Message[]      @relation("MessageReceiver")
+  notifications    Notification[]
+}
+
+// ============ STAGIAIRE ============
+
+model Stagiaire {
+  id              String   @id @default(uuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id])
+  dateNaissance   DateTime?
+  adresse         String?
+  codePostal      String?
+  ville           String?
+
+  carteIdentite   String?
+  diplome         String?
+  carteVitale     String?
+  cv              String?
+  lettreMotivation String?
+  fichePoste      String?
+
+  formationId     String?
+  formation       Formation? @relation(fields: [formationId], references: [id])
+  formateurId     String?
+  formateur       Formateur? @relation(fields: [formateurId], references: [id])
+  tuteurId        String?
+  tuteur          Tuteur?    @relation(fields: [tuteurId], references: [id])
+  clubId          String?
+  club            Club?      @relation(fields: [clubId], references: [id])
+
+  dateDebutContrat  DateTime?
+  dateFinContrat    DateTime?
+  dateDebutFormation DateTime?
+  dateFinFormation   DateTime?
+  format            String?
+  missionClub       String?
+
+  prerequisValides  Boolean @default(false)
+  compteValide      Boolean @default(false)
+  convocationEnvoyee Boolean @default(false)
+  besoinPC          Boolean @default(false)
+  pcEnvoye          Boolean @default(false)
+  plusDe30Ans       Boolean @default(false)
+  attestationEntreprise String?
+
+  carteEtudiante    String?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  plannings         Planning[]
+  coursStag         CoursParticipation[]
+  casPratiques      CasPratiqueRendu[]
+  questionnaires    QuestionnaireReponse[]
+  ecfs              ECFRendu[]
+  satisfactions     SatisfactionReponse[]
+  emargements       Emargement[]
+  dossierPro        DossierProfessionnel?
+  missionsUpdates   MissionUpdate[]
+  demandesImmersion DemandeImmersion[]
+  rencontresTuteur  RencontreTuteur[]
+  documentsAccueil  DocumentAccueil[]
+  compteRenduEntretien CompteRenduEntretien?
+  questionnaireInitial QuestionnaireInitial?
+  questionnaireAdaptation QuestionnaireAdaptation[]
+}
+
+// ============ FORMATEUR ============
+
+model Formateur {
+  id            String   @id @default(uuid())
+  userId        String   @unique
+  user          User     @relation(fields: [userId], references: [id])
+  specialite    String?
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  stagiaires      Stagiaire[]
+  coursDispenses  Cours[]
+  factures        Facture[]
+  disponibilites  Disponibilite[]
+  rencontresTuteur RencontreTuteur[]
+  relationsTrimestrielles RelationTrimestrielle[]
+  emargements     Emargement[]
+  seminairePresences SeminairePresence[]
+}
+
+// ============ TUTEUR ============
+
+model Tuteur {
+  id            String   @id @default(uuid())
+  userId        String   @unique
+  user          User     @relation(fields: [userId], references: [id])
+  clubId        String?
+  club          Club?    @relation(fields: [clubId], references: [id])
+  fonction      String?
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  stagiaires    Stagiaire[]
+  rencontresTuteur RencontreTuteur[]
+}
+
+// ============ CLUB / ENTREPRISE ============
+
+model Club {
+  id            String   @id @default(uuid())
+  nom           String
+  adresse       String?
+  codePostal    String?
+  ville         String?
+  telephone     String?
+  email         String?
+  siret         String?
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  stagiaires    Stagiaire[]
+  tuteurs       Tuteur[]
+  visites       Visite[]
+}
+
+// ============ FORMATION ============
+
+model Formation {
+  id               String   @id @default(uuid())
+  nom              String
+  codeRNCP         String?
+  volumeHoraire    Int
+  description      String?
+  referentielActivites String?
+  referentielEvaluation String?
+
+  unitesCompetences UnitCompetence[]
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  stagiaires       Stagiaire[]
+  seminaires       Seminaire[]
+  cours            Cours[]
+  casPratiques     CasPratique[]
+  ecfs             ECF[]
+  masterclasses    Masterclass[]
+}
+
+model UnitCompetence {
+  id            String   @id @default(uuid())
+  formationId   String
+  formation     Formation @relation(fields: [formationId], references: [id])
+  code          String
+  titre         String
+  description   String?
+
+  questionsAdaptation QuestionAdaptation[]
+  cours         Cours[]
+}
+
+// ============ PLANNING ============
+
+model Planning {
+  id            String   @id @default(uuid())
+  stagiaireId   String
+  stagiaire     Stagiaire @relation(fields: [stagiaireId], references: [id])
+  titre         String
+  type          String
+  dateDebut     DateTime
+  dateFin       DateTime
+  description   String?
+  lienTeams     String?
+  statut        String   @default("PLANIFIE")
+
+  coursId       String?
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// ============ COURS ============
+
+model Cours {
+  id             String   @id @default(uuid())
+  formationId    String
+  formation      Formation @relation(fields: [formationId], references: [id])
+  formateurId    String
+  formateur      Formateur @relation(fields: [formateurId], references: [id])
+  ucId           String?
+  uc             UnitCompetence? @relation(fields: [ucId], references: [id])
+
+  serie          Int
+  numero         Int
+  titre          String
+  contenuObjectif String?
+  thematiquesElearning String?
+  duree          Int      @default(60)
+  isPedagogique  Boolean  @default(false)
+
+  datePrevisionnelle DateTime?
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  participations CoursParticipation[]
+  casPratiqueAssoc CasPratique?
+}
+
+model CoursParticipation {
+  id              String   @id @default(uuid())
+  coursId         String
+  cours           Cours    @relation(fields: [coursId], references: [id])
+  stagiaireId     String
+  stagiaire       Stagiaire @relation(fields: [stagiaireId], references: [id])
+
+  signatureStagiaire Boolean @default(false)
+  signatureFormateur Boolean @default(false)
+  dateSignature      DateTime?
+  commentaireFormateur String?
+  compteRendu        String?
+  lienTeams          String?
+
+  statut           String   @default("PLANIFIE")
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@unique([coursId, stagiaireId])
+}
+
+// ============ CAS PRATIQUES ============
+
+model CasPratique {
+  id              String   @id @default(uuid())
+  formationId     String
+  formation       Formation @relation(fields: [formationId], references: [id])
+  coursId         String   @unique
+  cours           Cours    @relation(fields: [coursId], references: [id])
+
+  titre           String
+  description     String?
+  sujet           String?
+  renduAttendu    String?
+  heures          Int      @default(10)
+  type            String   @default("FICTIF")
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  rendus          CasPratiqueRendu[]
+}
+
+model CasPratiqueRendu {
+  id              String   @id @default(uuid())
+  casPratiqueId   String
+  casPratique     CasPratique @relation(fields: [casPratiqueId], references: [id])
+  stagiaireId     String
+  stagiaire       Stagiaire @relation(fields: [stagiaireId], references: [id])
+
+  fichierRendu    String?
+  dateRendu       DateTime?
+  commentaireFormateur String?
+  correctionFichier String?
+  dateCorrection  DateTime?
+  statut          String   @default("EN_ATTENTE")
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([casPratiqueId, stagiaireId])
+}
+
+// ============ QUESTIONNAIRES ============
+
+model QuestionnaireInitial {
+  id            String   @id @default(uuid())
+  stagiaireId   String   @unique
+  stagiaire     Stagiaire @relation(fields: [stagiaireId], references: [id])
+
+  nom           String
+  prenom        String
+  club          String
+  prerequis     String?
+  besoinsClub   String?
+  besoinPC      Boolean  @default(false)
+  autresInfos   String?
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model QuestionAdaptation {
+  id            String   @id @default(uuid())
+  ucId          String
+  uc            UnitCompetence @relation(fields: [ucId], references: [id])
+  question      String
+  choixA        String
+  choixB        String
+  choixC        String
+  choixD        String?
+  bonneReponse  String
+
+  reponses      QuestionnaireAdaptation[]
+}
+
+model QuestionnaireAdaptation {
+  id            String   @id @default(uuid())
+  stagiaireId   String
+  stagiaire     Stagiaire @relation(fields: [stagiaireId], references: [id])
+  questionId    String
+  question      QuestionAdaptation @relation(fields: [questionId], references: [id])
+
+  reponse       String
+  estCorrect    Boolean
+
+  createdAt     DateTime @default(now())
+}
+
+model QuestionnaireReponse {
+  id            String   @id @default(uuid())
+  stagiaireId   String
+  stagiaire     Stagiaire @relation(fields: [stagiaireId], references: [id])
+  type          String
+  contenu       String
+  score         Float?
+
+  createdAt     DateTime @default(now())
+}
+
+// ============ SEMINAIRES ============
+
+model Seminaire {
+  id            String   @id @default(uuid())
+  formationId   String
+  formation     Formation @relation(fields: [formationId], references: [id])
+  titre         String
+  dateDebut     DateTime
+  dateFin       DateTime
+  dureeJours    Float    @default(4.5)
+  heuresParJour Int      @default(10)
+  lieu          String?
+  description   String?
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  emargements   Emargement[]
+  presences     SeminairePresence[]
+}
+
+model Emargement {
+  id            String   @id @default(uuid())
+  seminaireId   String
+  seminaire     Seminaire @relation(fields: [seminaireId], references: [id])
+  stagiaireId   String
+  stagiaire     Stagiaire @relation(fields: [stagiaireId], references: [id])
+  formateurId   String?
+  formateur     Formateur? @relation(fields: [formateurId], references: [id])
+
+  date          DateTime
+  matin         Boolean  @default(false)
+  apresMidi     Boolean  @default(false)
+  signature     String?
+
+  createdAt     DateTime @default(now())
+
+  @@unique([seminaireId, stagiaireId, date])
+}
+
+model SeminairePresence {
+  id            String   @id @default(uuid())
+  seminaireId   String
+  seminaire     Seminaire @relation(fields: [seminaireId], references: [id])
+  formateurId   String
+  formateur     Formateur @relation(fields: [formateurId], references: [id])
+
+  present       Boolean?
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([seminaireId, formateurId])
+}
+
+// ============ ECF ============
+
+model ECF {
+  id            String   @id @default(uuid())
+  formationId   String
+  formation     Formation @relation(fields: [formationId], references: [id])
+  numero        Int
+  titre         String
+  sujet         String?
+  delaiSemaines Int      @default(3)
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  rendus        ECFRendu[]
+}
+
+model ECFRendu {
+  id              String   @id @default(uuid())
+  ecfId           String
+  ecf             ECF      @relation(fields: [ecfId], references: [id])
+  stagiaireId     String
+  stagiaire       Stagiaire @relation(fields: [stagiaireId], references: [id])
+
+  dateOuverture   DateTime
+  dateLimite      DateTime
+  fichierRendu    String?
+  dateRendu       DateTime?
+  correctionFormateur String?
+  dateCorrection  DateTime?
+  dateJury        DateTime?
+  statut          String   @default("OUVERT")
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([ecfId, stagiaireId])
+}
+
+// ============ RENCONTRES TUTEUR ============
+
+model RencontreTuteur {
+  id            String   @id @default(uuid())
+  stagiaireId   String
+  stagiaire     Stagiaire @relation(fields: [stagiaireId], references: [id])
+  formateurId   String
+  formateur     Formateur @relation(fields: [formateurId], references: [id])
+  tuteurId      String?
+  tuteur        Tuteur?  @relation(fields: [tuteurId], references: [id])
+
+  numero        Int
+  datePrevisionnelle DateTime?
+  dateRealisee  DateTime?
+  compteRendu   String?
+  statut        String   @default("A_PROGRAMMER")
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// ============ DOSSIER PROFESSIONNEL ============
+
+model DossierProfessionnel {
+  id            String   @id @default(uuid())
+  stagiaireId   String   @unique
+  stagiaire     Stagiaire @relation(fields: [stagiaireId], references: [id])
+
+  contenu       String   @default("")
+  derniereMaj   DateTime @default(now())
+  journeeDedieeDate DateTime?
+  journeeDedieeFaite Boolean @default(false)
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  elements      DossierProElement[]
+}
+
+model DossierProElement {
+  id            String   @id @default(uuid())
+  dossierId     String
+  dossier       DossierProfessionnel @relation(fields: [dossierId], references: [id])
+
+  titre         String
+  contenu       String
+  ajoutePar     String
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// ============ MESSAGING ============
+
+model Message {
+  id            String   @id @default(uuid())
+  senderId      String
+  sender        User     @relation("MessageSender", fields: [senderId], references: [id])
+  receiverId    String
+  receiver      User     @relation("MessageReceiver", fields: [receiverId], references: [id])
+
+  contenu       String
+  type          String   @default("MESSAGE")
+  lu            Boolean  @default(false)
+
+  createdAt     DateTime @default(now())
+}
+
+// ============ NOTIFICATIONS ============
+
+model Notification {
+  id            String   @id @default(uuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+
+  titre         String
+  contenu       String
+  type          String
+  lien          String?
+  lu            Boolean  @default(false)
+
+  createdAt     DateTime @default(now())
+}
+
+// ============ SATISFACTION ============
+
+model SatisfactionReponse {
+  id            String   @id @default(uuid())
+  stagiaireId   String
+  stagiaire     Stagiaire @relation(fields: [stagiaireId], references: [id])
+
+  type          String
+  periode       Int
+  reponses      String
+
+  createdAt     DateTime @default(now())
+}
+
+// ============ FACTURES FORMATEUR ============
+
+model Facture {
+  id            String   @id @default(uuid())
+  formateurId   String
+  formateur     Formateur @relation(fields: [formateurId], references: [id])
+
+  mois          Int
+  annee         Int
+  nbHeures      Float
+  heuresValidees Boolean @default(false)
+  fichierFacture String?
+  statut        String   @default("BROUILLON")
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Disponibilite {
+  id            String   @id @default(uuid())
+  formateurId   String
+  formateur     Formateur @relation(fields: [formateurId], references: [id])
+
+  dateDebut     DateTime
+  dateFin       DateTime
+  recurrent     Boolean  @default(false)
+
+  createdAt     DateTime @default(now())
+}
+
+// ============ RELATIONS TRIMESTRIELLES ============
+
+model RelationTrimestrielle {
+  id            String   @id @default(uuid())
+  formateurId   String
+  formateur     Formateur @relation(fields: [formateurId], references: [id])
+
+  trimestre     Int
+  annee         Int
+  problemes     String?
+  difficultesSuivi String?
+  plateformeRetour String?
+  ameliorationContinue String?
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// ============ MISSIONS ============
+
+model MissionUpdate {
+  id            String   @id @default(uuid())
+  stagiaireId   String
+  stagiaire     Stagiaire @relation(fields: [stagiaireId], references: [id])
+
+  contenu       String
+  periode       Int
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// ============ VISITES ============
+
+model Visite {
+  id            String   @id @default(uuid())
+  clubId        String
+  club          Club     @relation(fields: [clubId], references: [id])
+
+  type          String
+  date          DateTime
+  compteRendu   String?
+  organisePar   String
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// ============ IMMERSION ============
+
+model DemandeImmersion {
+  id            String   @id @default(uuid())
+  stagiaireId   String
+  stagiaire     Stagiaire @relation(fields: [stagiaireId], references: [id])
+
+  entreprise    String
+  nbJours       Int
+  datesSouhaitees String?
+  motif         String?
+  statut        String   @default("EN_ATTENTE")
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// ============ MASTERCLASS ============
+
+model Masterclass {
+  id            String   @id @default(uuid())
+  formationId   String?
+  formation     Formation? @relation(fields: [formationId], references: [id])
+
+  titre         String
+  description   String?
+  date          DateTime
+  duree         Int
+  intervenant   String?
+  lien          String?
+  obligatoire   Boolean  @default(false)
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// ============ COMPTE-RENDU ENTRETIEN ============
+
+model CompteRenduEntretien {
+  id            String   @id @default(uuid())
+  stagiaireId   String   @unique
+  stagiaire     Stagiaire @relation(fields: [stagiaireId], references: [id])
+
+  commercial    String
+  contenu       String
+  prerequisValides Boolean @default(false)
+  dateEntretien DateTime
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// ============ DOCUMENTS ACCUEIL ============
+
+model DocumentAccueil {
+  id            String   @id @default(uuid())
+  stagiaireId   String
+  stagiaire     Stagiaire @relation(fields: [stagiaireId], references: [id])
+
+  type          String
+  fichier       String?
+  genere        Boolean  @default(false)
+
+  createdAt     DateTime @default(now())
+}
