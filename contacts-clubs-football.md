@@ -1,6 +1,6 @@
 # Contacts Clubs de Football - Nouvelle-Aquitaine & Bretagne
 
-> Dernière mise à jour : Mars 2026
+> Dernière mise à jour : 27 Mars 2026
 > **Note** : Les informations proviennent de sources publiques (FFF, sites officiels des clubs, ligues). Certaines données peuvent avoir changé.
 
 ---
@@ -413,6 +413,180 @@
 | US Bugeat | Stéphane Prudhomme (secrétaire) |
 | AS Marcillac Clergoux | Frédéric Ratelade |
 | FC Cosnac | Stéphane Tarif (co-président) |
+
+### Contacts clubs Nouvelle-Aquitaine (fiches FFF epreuves.fff.fr - Mars 2026)
+
+#### GIRONDE (33)
+
+| N° | Club | Ville | President | Email | Tel |
+|----|------|-------|-----------|-------|-----|
+| 500211 | F.C. Girondins de Bordeaux | Bordeaux | Jean Louis Triaud | asaintandre@girondins.com / 500211@lfna.fr | - |
+| 500021 | Stade Bordelais | Bordeaux | - | foot@stade-bordelais.com | - |
+| 500042 | Bordeaux Etudiants C. | Bordeaux | Bureau Yannick | yann.bureau@gmail.com | - |
+| 500045 | C.ML Floirac | Floirac | Fellah Yasmina | yasmina.fellah@gmail.com | - |
+| 500060 | Bordeaux A.C. | Bordeaux | Hamache Lyes | lyes.33@hotmail.fr | - |
+| 500343 | S.C. de Cadaujac | Cadaujac | Massonie Yohann | yohann.massonie@orange.fr | 0631567786 |
+| 505572 | Racing Club de Bordeaux | Bordeaux | - | - | - |
+| 505610 | F.C. Libourne | Libourne | Mahdi Mondheur | capello-07@hotmail.fr (corresp.) | 0695503461 |
+| 548459 | ABP St Médard en Jalles | St Médard en Jalles | Le Diabat Alain | alain.lediabat@gmail.com | 0614148861 |
+| 550999 | Pessac Football Club | Pessac | El Aouady Rabii | pessac.chataigneraie@gmail.com | - |
+| 551006 | US Nord Gironde | - | Menard Jean Charles | menard66@hotmail.fr | 0686861664 |
+| 551098 | Sud Gironde FC | - | - | cfounaou@me.com | 0647462941 |
+| 553257 | FC Estuaire/Haute Gironde | - | Furlan Albert | gilbert.martinez522@orange.fr (corresp.) | 0607032489 |
+| 560903 | Bordeaux Futsal | Bordeaux | Courty Diaz Anthony | anthony.courty33@gmail.com | - |
+| 563836 | Asso Promotion Insertion Sport | Bordeaux | Liegaux Franck | franzy33@free.fr | 0764458915 |
+| 580598 | FC Bassin d'Arcachon | Arcachon | - | - | - |
+| 580608 | F.C. Talence | Talence | Aloy Wilfried | fctalence.aloy.w@gmail.com | 0618305930 |
+| 581856 | FC Gradignan | Gradignan | Mallemouche Arnaud | arnaud.mallemouche@gmail.com | 0603052491 |
+| 603159 | Union Bordeaux Métropole | Bordeaux | - | - | - |
+
+#### CHARENTE (16)
+
+| N° | Club | Ville | President | Email | Tel |
+|----|------|-------|-----------|-------|-----|
+| 552163 | Angoulême Charente FC | Angoulême | Triaud Patrick | contact@acfcfootball.net | 0661422488 |
+| 547099 | FC Haute Charente | - | Sebastien de Warren | - | 0632669531 |
+| 507081 | C.S. St Michel s/Charente | - | Rossignol Chrystel | - | 0679274095 |
+| 507328 | FC Charentais Isle d'Espagnac | - | Girard Francis | 507328@lfna.fr / francisg@sfr.fr | 0698233439 |
+| 518051 | C.S. Leroy Angoulême | Angoulême | Hebre Valerie | maria.canalespons@gmail.com (SG) | 0683533703 |
+| 519069 | C.A. St Meme les Carrières | - | Lajugie Sebastien | - | 0659096806 |
+
+#### CHARENTE-MARITIME (17)
+
+| N° | Club | Ville | President | Email | Tel |
+|----|------|-------|-----------|-------|-----|
+| 540957 | Assoc. Futsal des 2 Charentes | - | Andre Damien | damienandre.17@wanadoo.fr | 0615933593 |
+| 547656 | A.S. Guittinières le Virouil | - | Merias Edmond | - | 0633414490 |
+| 550807 | Rochefort FC | Rochefort | De Sousa Jose | josedesousa977@gmail.com | 0689319698 |
+| 560816 | Football Club Sud 17 | - | Chaubenit Frédéric | - | - |
+| 581431 | Association Culture Sport | La Rochelle | Rais Mohamed | rfk1759@gmail.com | 0627033558 |
+| 527856 | A.S.S. Portugais La Rochelle | La Rochelle | Teixeira Jeremy | jeremy.teix@hotmail.fr | 0683413142 |
+| 553245 | Ent. S. La Rochelle | La Rochelle | - | - | - |
+| 582433 | Sporting Atlantique Royan Futsal | Royan | Bellout Sébastien | limsa78@hotmail.com | 0617908870 |
+
+#### CORREZE (19)
+
+| N° | Club | Ville | President | Email | Tel |
+|----|------|-------|-----------|-------|-----|
+| 542517 | Tulle Football Corrèze | Tulle | Novais Robert | tulle-football-correze@orange.fr | 0672250450 |
+| 525452 | A.S. Aixoise | Aix | Vicaire Elodie | mylene.bouyat@orange.fr (corresp.) | 0618519038 |
+| 560180 | Amicale Sportive Maussacoise | Maussac | Akar Mehmet | mehmetakar1966@icloud.com | 0668724329 |
+| 540658 | A.S. Treignacoise FC | Treignac | Caribeaux William | william.caribeaux@free.fr | 0673183245 |
+| 560182 | FC Cornilois Fortunadais | Ste Fortunade | Zajac Nicolas | annedumond@orange.fr (corresp.) | 0672250903 |
+| 527855 | Am. St Hilaire Venarsal | St Hilaire Peyroux | Arteil Jean Paul | jeanpaularteil@gmail.com | 0607776080 |
+| 581483 | Assoc. Sportive Turcs d'Ussel | Ussel | Duztepe Cemil | - | 0675100577 |
+| 506980 | Et.S. Aiglons Brive | Brive | - | - | - |
+
+#### CREUSE (23)
+
+| N° | Club | Ville | President | Email | Tel |
+|----|------|-------|-----------|-------|-----|
+| 523327 | FC St Rémy s/Creuse | St Rémy | Besnault Denis | denis.besnault@orange.fr | 0675253095 |
+| 504876 | US Argenton s/Creuse | Argenton | Martin Franck | argenton.foot@gmail.com | 0642720655 |
+| 545740 | Ent.F. Aubussonnais | Aubusson | Simoes Louis | lmds16121970@laposte.net | 0686275454 |
+| 580760 | Association Creuse Maghreb | Guéret | Baddi Omar | roma.23@hotmail.fr | 0673989328 |
+| 552084 | Creuse Avenir 2005 | - | - | - | - |
+
+#### DORDOGNE (24)
+
+| N° | Club | Ville | President | Email | Tel |
+|----|------|-------|-----------|-------|-----|
+| 563716 | Bergerac Périgord FC | Bergerac | - | contact@bergeracperigordfc.fr | 0553743389 |
+| 563729 | E.S. Cours de Pile | Cours de Pile | Simon Jean Michel | hana.bourg@gmail.com (corresp.) | 0611848607 |
+| 545480 | US Villefranche de Lonchat | Villefranche de Lonchat | Moreau Florence | florence.moreau1964@gmail.com | 0632378785 |
+| 518714 | C.C.S. Val d'Amour | - | Lavigne Arnaud | arnaudlavigne24@orange.fr | 0699010423 |
+| 552085 | Trélissac Antonne Périgord FC | Trélissac | - | 552085@lfna.fr / johann.alberny@trelissac-fc.com | 0553078593 |
+| 564795 | Futsal Club Périgueux | Périgueux | - | rayan.yahiaoui93@icloud.com | - |
+
+#### LANDES (40)
+
+| N° | Club | Ville | President | Email | Tel |
+|----|------|-------|-----------|-------|-----|
+| 533882 | FC St Geours | St Geours de Maremne | Amado Soares Willy | willyplomberie@orange.fr | - |
+| 548277 | Landes Girondines FC | - | Desveaux Stéphanie (co-prés.) | thomasgouges.pro@gmail.com (VP) | 0695627434 |
+| 582077 | Chalosse Futsal | Hinx | Moreira Tony | - | - |
+| 505739 | La Jeanne d'Arc de Dax | Dax | - | - | - |
+| 532419 | A.S. Bretagne Marsan | Mont de Marsan | Fezans Denis | denisfezans@gmail.com | - |
+| 535772 | St Paul Sport | St Paul les Dax | Jacquemain Vincent | 535772@lfaquitaine.fr | 0686417003 |
+| 510983 | La Violette Aturine | Aire sur l'Adour | Cazaban Andrée | a.cazaban@wanadoo.fr | 0629430270 |
+| 581325 | Seignosse Capbreton Soustons FC | Capbreton | - | - | 0682140156 |
+| 505774 | Football Club Hagetmau | Hagetmau | - | - | - |
+
+#### LOT-ET-GARONNE (47)
+
+| N° | Club | Ville | President | Email | Tel |
+|----|------|-------|-----------|-------|-----|
+| 554433 | Olympique Sportif Agenais | Agen | Soussi Khaled | khaled4731@hotmail.fr | 0760310833 |
+| 580553 | Confluent Football 47 | Aiguillon | Sartori Jean Michel | jmsartori47@aol.com | 0611326074 |
+| 546374 | A.S. Marcellus Cocumont | Marcellus | Labadie Sebastien | bidifayssous@gmail.com | 0614103772 |
+| 560331 | Futsal Club Pujols | Pujols | Herin Didier | didierba123@msn.com | 0770474849 |
+| 581519 | Agen Racing Club | Agen | El Kouchni Ayoub | nenekoka47@gmail.com (corresp.) | 0695636313 |
+| 521258 | REV's St Sernin | St Sernin de Duras | Renon Thierry | pa.thierryrenon@orange.fr | 0608720494 |
+| 522239 | Ent. Boe Bon Encontre | Boe | Truilhe Bernard | abbr.truilhe@wanadoo.fr | 0618977445 |
+| 518856 | FC Marmande 47 | Marmande | Tunica Bertrand | lyazid.bahlali@gmail.com (co-prés.) | 0621193035 |
+| 518161 | Tonneins FC | Tonneins | Daunis Jean | pdaunis@hotmail.fr (SG) | - |
+| 564912 | Football Club Savérien | La Sauvetat de Savères | Marguerettaz Enzo | - | - |
+| 533111 | FC de Castelmoron s/Lot | Castelmoron | Lesizza Didier | - | 0607975505 |
+| 514619 | Mas A.C. | Le Mas d'Agenais | Anciaux Hervé | - | 0769618073 |
+
+#### PYRENEES-ATLANTIQUES (64)
+
+| N° | Club | Ville | President | Email | Tel |
+|----|------|-------|-----------|-------|-----|
+| 505684 | Aviron Bayonnais | Bayonne | Sangare Lausseni | contact@avironbayonnaisfc.fr | 0559582019 |
+| 505608 | Arin Luzien | St Jean de Luz | Ortiz Stephane | - | - |
+| 501681 | Pau FC | Pau/Bizanos | - | - | - |
+| 506101 | El. Béarnais d'Orthez | Orthez | Labeyrie Xavier | xavier.labeyrie@dgfip.finances.gouv.fr | 0650442898 |
+| 582370 | FC Oloron Béarn | Oloron Ste Marie | Gruel Jean Marie | jmgruel@gmail.com | 0651192136 |
+| 545607 | E.T.S. Pyrénéenne | - | Latrubesse Hervé (co-prés.) | jluclarrere@orange.fr | 0686604816 |
+| 505689 | La Jeanne d'Arc de Biarritz | Biarritz | Richard Pierre | - | - |
+| 524439 | FC Espagnol de Pau | Pau | - | - | - |
+| 540182 | ASPTT de Pau | Pau | - | - | - |
+
+#### DEUX-SEVRES (79)
+
+| N° | Club | Ville | President | Email | Tel |
+|----|------|-------|-----------|-------|-----|
+| 506978 | Chamois Niortais FC | Niort | Fleurquin Guy | guy.fleurquin@free.fr / direction@chamoisniortais.fr | 0607054524 |
+| 580500 | GJ Vallées Deux-Sèvres | - | Boucard Loic | loic.boucard@cegetel.net | - |
+| 580637 | G.J. Sud Deux-Sèvres Foot | Frontenay Rohan Rohan | Barbotin Jean Claude | jcbarbotin@wanadoo.fr | 0607681394 |
+| 563787 | Football Club Boutonnais | - | Magnan Laurent | magnan.lcm@orange.fr | - |
+| 581382 | Union Sud Deux-Sèvres | - | Roy Bertrand | - | - |
+| 851805 | Étoile Sportive de Niort | Niort | Benhamou Djilali | djilali.benhamou04@gmail.com | 0656810305 |
+| 520162 | O.L. St Liguaire Niort | Niort | Poncelet Katia | - | 0636069524 |
+| 507145 | FC Bressuire | Bressuire | - | - | - |
+
+#### VIENNE (86)
+
+| N° | Club | Ville | President | Email | Tel |
+|----|------|-------|-----------|-------|-----|
+| 554244 | GJ Foot Sud 86 | - | Barrusseau Benoit | tresorier.gjfs86@gmail.com (corresp.) | 0675741397 |
+| 507793 | Assoc. Sportive Poitiers 86 | Poitiers | Robin Johan | formaresth@wanadoo.fr (SG) | 0680145586 |
+| 564540 | FC des 3 Vallées 86 | Lhommaize | Focone Benoit | katy.toph@gmail.com (corresp.) | 0613993486 |
+| 553156 | U.S. Nord Vienne | Morton | Guette Cédric | cedricguette86@gmail.com | 0623202159 |
+| 560913 | FC Vallée du Salleron | Journet | Gueraud Tony | tonygueraud1@gmail.com | 0678887824 |
+| 546993 | F.C. de Madrie | - | Venet Véronique | venet.veronique@yahoo.com | 0681726294 |
+| 506983 | C.A. Neuville | Neuville de Poitou | Gourdon Valentin | fr.marcireau86@gmail.com (SG) | 0684569800 |
+| 553375 | CEP Poitiers 1892 | Poitiers | Ganon Dimitri | psj-cep@orange.fr (corresp.) | - |
+| 553111 | Stade Poitevin FC | Poitiers | Nabe Philippe | nanoufoot@gmail.com (corresp.) | 0684155112 |
+| 517415 | Ent.S. des Trois Cités Poitiers | Poitiers | Faye Simon | estc@es3citesfoot-poitiers.org | 0778475959 |
+| 590228 | A.C.G. Foot Sud 86 | Civray | Gaillard Laurent | - | - |
+
+#### HAUTE-VIENNE (87)
+
+| N° | Club | Ville | President | Email | Tel |
+|----|------|-------|-----------|-------|-----|
+| 520964 | S.C. Verneuil s/Vienne | Verneuil s/Vienne | Lamberty Kevin | - | - |
+| 524982 | A.S. Fromental | Fromental | Paufique Adrien | - | 0643974728 |
+| 507210 | A.S. Eymoutiers | Eymoutiers | Trichard Laurent | ltd@cegetel.net | 0641280132 |
+| 513703 | C.A. St Victurnien | St Victurnien | Vignaud Audrey | chaudrez@hotmail.fr | 0689683586 |
+| 507944 | ASPTT Limoges | Limoges | Vignaud Christophe | vignaud.christophe87@gmail.com | 0623002763 |
+| 560164 | C.A.P.O Limoges | Limoges | Mouthaud Nicolas | nicolas.mouthaud@orange.fr | 0624933128 |
+| 560360 | Limoges Football | Limoges | Robert Michel | - | 0676762816 |
+| 522163 | Limoges Landouge F. | Limoges | Magnat Guillaume | ballereaumatthieu@yahoo.fr (co-prés.) | 0678137464 |
+| 582728 | Union Sportive Limoges Bastide | Limoges | Asfouri Mehdi | - | - |
+| 560233 | Assoc. Culturelle Turque Limoges | Limoges | Ates Ayhan | actl.limoges@gmail.com | 0630048786 |
+| 539700 | FC St Georges les Landes | St Georges les Landes | Aucharles Ludovic | samaaucharles@live.fr | 0660546641 |
 
 ### Annuaires tiers et alternatives
 
