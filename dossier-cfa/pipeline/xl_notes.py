@@ -90,3 +90,48 @@ finish(ws,freeze='A4'); ws.auto_filter.ref=f"A3:F{r-1}"
 wb.save('Notes_de_frais_WEFORM.xlsx')
 print('Notes_de_frais_WEFORM.xlsx —',len(wb.sheetnames),'onglets |',len(NOTES),'notes',len(REGL),'règlements',len(CHG),'lignes de charge')
 print('contrôle : notes',round(T,2),'| lignes de charge',round(sum(c['debit'] for c in CHG),2))
+
+# --- remboursements à une entité tierce ---------------------------------------
+ws=wb.create_sheet('Achats pour compte'); r=title(ws,1,
+  "Les notes de frais qui remboursent un achat fait chez un tiers",
+  "À distinguer des indemnités kilométriques : ici le salarié a payé un fournisseur de sa poche, "
+  "et la facture est à son nom, pas à celui de la société.")
+ENT={'30/04/2025':('Bolt + Supabase',"« Douze lignes BOLT + SUPABASE sur la note d'avril 2025, aucun kilomètre » (dossier de synthèse WE-FORM)"),
+     '31/05/2025':('Bolt 88,00 + Digiforma 223,20',"« BOLT - ABO MAI - 100$ » 88,00 € et « DIGIFORMA » 223,20 € (dossier de synthèse WE-FORM)"),
+     '04/08/2025':('Supabase',"Le libellé du grand livre le nomme : « SUPABASE (AVANCE) ». Votre modèle : « VIR INST SUPABASE — Base de données We-Admin »."),
+     '30/04/2026':('Anthropic — API Claude',"Votre modèle isole « Note de frais avril — part API Claude » pour 738,00 €."),
+     '31/07/2026':('Non identifiée',"Libellé « AVANCE FRAIS IA ». Aucune entité nommée, ni au grand livre ni au modèle analytique.")}
+CH=[c for c in CHG if qui(c['libelle'])=='Anthony GRANDCLEMENT' and c['compte']=='6135000']
+r=header(ws,r,['Date','Libellé du grand livre','Montant','Entité derrière la dépense','Comment on le sait'],
+         [11,50,13,30,86],['center','left','right','left','left'])
+for c in sorted(CH,key=dt):
+    e=ENT.get(c['date'],('—',''))
+    r=row(ws,r,[c['date'],c['libelle'],c['debit'],e[0],e[1]],['c','','n','','w'],
+          color=(BRIQUE if e[0]=='Non identifiée' else None))
+r=total(ws,r,['','Total des achats faits pour le compte de la société',round(sum(c['debit'] for c in CH),2),'',''],
+        ['','','n','',''])
+r+=1
+tot_a=round(sum(n['credit'] for n in NOTES if qui(n['libelle'])=='Anthony GRANDCLEMENT'),2)
+ik=round(tot_a-sum(c['debit'] for c in CH),2)
+r=header(ws,r,['Ses notes de frais, en deux blocs','Montant','Part'],[54,15,10],['left','right','right'])
+for lab,v in [("Achats payés chez un tiers et remboursés (logiciels, abonnements)",round(sum(c['debit'] for c in CH),2)),
+              ("Indemnités kilométriques, péages, repas et logement",ik)]:
+    r=row(ws,r,[lab,v,round(100*v/tot_a,2)],['','n','p'])
+r=total(ws,r,['Total des notes de frais d\'Anthony GRANDCLEMENT',tot_a,100.0],['','n','p'])
+r+=1
+r=header(ws,r,['Ces fournisseurs sont aussi facturés en direct','Facturé en direct','Via note de frais','Remarque'],
+         [30,18,18,74],['left','right','right','left'])
+DBL=[('Bolt (StackBlitz)',2016.92,88.00,"Plus une part indéterminée des 439,63 € de la note d'avril 2025."),
+     ('Supabase',87.97,1508.17,"1 508,17 € remboursés à Anthony contre 87,97 € facturés en direct : l'essentiel de la dépense passe par lui."),
+     ('Anthropic',1296.36,738.01,"Plus, peut-être, les 1 100 € de « AVANCE FRAIS IA » de juillet 2026."),
+     ('Digiforma',1951.20,223.20,"Le direct passe par A World For Us (prélèvement GoCardless).")]
+for n_,a,b,rem in DBL: r=row(ws,r,[n_,a,b,rem],['','n','n','w'])
+r=note(ws,r,"Un même fournisseur réglé par deux canaux : c'est le point à traiter. Quand la facture est au nom "
+            "d'Anthony GRANDCLEMENT, la société perd la TVA déductible et la charge ne tient que par la note de frais. "
+            "Le plus simple est de basculer ces abonnements sur un moyen de paiement de la société, comme cela a déjà "
+            "été fait pour la part facturée en direct.",4)
+r=note(ws,r,"À part : la note du 06/12/2025, « TRANSPORT \"RT\" (A JUSTIFIER) » pour 314,00 €. La mention « à justifier » "
+            "est du cabinet lui-même, elle figure telle quelle au grand livre.",4)
+finish(ws,cols=[11,50,13,30,86])
+wb.save('Notes_de_frais_WEFORM.xlsx')
+print("onglet « Achats pour compte » ajouté —",len(wb.sheetnames),'onglets')
