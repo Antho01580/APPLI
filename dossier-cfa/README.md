@@ -10,6 +10,7 @@ et dossier analytique associé.
 | `livrables/Grand_livre_CFA_WEFORM.pdf` | Le grand livre complet (72 pages) — clients, fournisseurs, comptes généraux — au format et au design SECOGEST, avec les comptes CFA. |
 | `livrables/Balance_CFA_WEFORM.pdf` | La balance correspondante (6 pages), y compris la récapitulation. |
 | `livrables/Analytique_CFA_WEFORM.xlsx` | Le dossier analytique, 15 onglets, format neutre WE-FORM. |
+| `livrables/Verification_analytique_WEFORM.html` | Le même dossier en page interactive : **chaque chiffre s'ouvre sur les lignes de grand livre qui le composent**, et le tiroir recalcule la somme pour afficher le contrôle de concordance. |
 
 ## Règle d'arbitrage
 
@@ -63,6 +64,11 @@ vent.py          ventilation sur les cinq axes            → vent_cfa.json
 cascade.py       cascade des clés de répartition
 axes_cfa.py      axes CFA (lieu, outil, matériel, titres, stagiaires)
 build_xlsx.py    génère le classeur analytique            → *.xlsx
+export_json.py   export compact pour la page de vérification → data.json
+head.html / body.html / app.js / sections.js  la page de vérification
 ```
+
+La page de vérification s'assemble en concaténant `head.html`, `body.html`, puis
+`data.json` et les deux scripts dans un unique bloc `<script>`.
 
 Dépendances : `pdfplumber`, `openpyxl`, `reportlab`.
