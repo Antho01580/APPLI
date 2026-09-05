@@ -1,0 +1,63 @@
+# Dossier CFA WE-FORM — exercice 1 (17/04/2025 → 31/07/2026)
+
+Reprise du grand livre et de la balance SECOGEST dans le **plan comptable CFA** de WE-FORM,
+et dossier analytique associé.
+
+## Livrables
+
+| Fichier | Contenu |
+|---|---|
+| `livrables/Grand_livre_CFA_WEFORM.pdf` | Le grand livre complet (75 pages) — clients, fournisseurs, comptes généraux — au format et au design SECOGEST, avec les comptes CFA. |
+| `livrables/Balance_CFA_WEFORM.pdf` | La balance correspondante (6 pages), y compris la récapitulation. |
+| `livrables/Analytique_CFA_WEFORM.xlsx` | Le dossier analytique, 14 onglets, format neutre WE-FORM. |
+
+## Règle d'arbitrage
+
+**Le grand livre fait foi.** Le dossier analytique remis par WE-FORM ne détermine que
+(a) le compte CFA et (b) le rattachement analytique — jamais la date, ni le montant, ni le
+libellé d'une écriture. Les 2 723 lignes du grand livre sont reprises telles quelles.
+
+## Chiffres
+
+| | |
+|---|---:|
+| Résultat comptable SECOGEST | 141 950,06 |
+| Résultat en plan comptable CFA | **29 291,75** |
+| dont apprentissage (après cascade) | 9 330,23 |
+| dont formation continue | 18 953,21 |
+| dont Ligue AURA | 2 215,90 |
+| dont hors périmètre | −1 207,59 |
+
+Le passage de l'un à l'autre est détaillé, poste par poste, dans l'onglet
+« 9. Maîtrise du résultat ».
+
+## Contrôles
+
+- L'extraction du PDF d'origine se recale sur **tous** les totaux imprimés et **tous** les
+  soldes progressifs : 0 écart.
+- La balance CFA est équilibrée ; le bilan fait apparaître le résultat.
+- La somme des cinq axes analytiques redonne le résultat au centime.
+- La cascade des clés conserve le résultat.
+- Les marges par titre redonnent le résultat de l'apprentissage.
+
+## Pipeline
+
+Les scripts de `pipeline/` régénèrent l'ensemble à partir du PDF d'origine :
+
+```
+extract_gl.py    extraction certifiée du grand livre PDF  → gl_raw.json
+plan_cfa.py      plan comptable CFA (codes et intitulés)
+mapping.py       correspondance compte SECOGEST → compte CFA
+apply_map.py     application du mapping                   → gl_cfa.json
+match.py         appariement grand livre ↔ modèle analytique
+cloture.py       écritures de clôture au 31/07/2026        → cloture.json
+render_gl.py     rendu du grand livre au format SECOGEST
+render_bal.py    rendu de la balance au format SECOGEST
+build_gl.py      génère les deux PDF                      → *.pdf
+vent.py          ventilation sur les cinq axes            → vent_cfa.json
+cascade.py       cascade des clés de répartition
+axes_cfa.py      axes CFA (lieu, outil, matériel, titres, stagiaires)
+build_xlsx.py    génère le classeur analytique            → *.xlsx
+```
+
+Dépendances : `pdfplumber`, `openpyxl`, `reportlab`.
