@@ -1,5 +1,8 @@
 # Dossier CFA WE-FORM — exercice 1 (17/04/2025 → 31/07/2026)
 
+> **Pour reprendre le dossier : lire [`PASSATION.md`](PASSATION.md)** — contexte,
+> décisions prises, chiffres, points ouverts et mode de reprise.
+
 Reprise du grand livre et de la balance SECOGEST dans le **plan comptable CFA** de WE-FORM,
 et dossier analytique associé.
 
