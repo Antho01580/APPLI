@@ -11,7 +11,7 @@ import re
 # --- 1. correspondance par défaut, compte à compte -------------------------------
 DEFAUT = {
  '1013000':'101', '1640000':'164',
- '2050000':'205',        # ingénierie E. BENALI — immobilisée par SECOGEST (cf. point ouvert n°1)
+ '2050000':'611',        # ingénierie E. BENALI — passée en charge (convention de 25 000 €, 15 000 sur l'exercice)
  '2156000':'6068',       # 51 PC portables laissés aux apprentis -> charge (décision client)
  '2183000':'2183',
  '40':'401', '41':'411',
@@ -89,7 +89,6 @@ EXCEPTIONS = {
  1763: ('6132.9', "FC SAINT CLAUDE 4 000 — bureau mis à disposition à l'année, charge de structure"),
  1790: ('6064',   "note de frais Xavier GAUSSENS 08.2025 — matériel, pas un produit d'entretien"),
  2155: ('623',    "INTERSPORT cartes cadeaux — contrepartie d'un travail de communication"),
- 1082: ('6256.9', "BOOKING — le remboursement rejoint sa charge"),
  2707: ('706.11', "AURILLAC-2 750 — reste à charge employeur sur contrat d'apprentissage"),
  2709: ('706.11', "STADE OLYMPIQUE CHAMBERIEN 750 — reste à charge employeur sur contrat d'apprentissage"),
  # arbitrages complémentaires du rapprochement

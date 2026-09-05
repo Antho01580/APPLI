@@ -307,21 +307,18 @@ PASSAGE = [
   "Balance SECOGEST, « Bénéfice »"),
  ('1', "Matériel pédagogique : 51 PC portables passés du compte 2156000 à la charge 6068", -25500.00,
   "Grand livre CFA, compte 6068"),
- ('2', "Solde versé à SMART AINFO au-delà des factures, passé en charge", -500.00, "Écriture CL-5"),
- ('3', "Compte d'attente 4710000 soldé : ses 93 opérations rejoignent leurs comptes de charge", -18227.40,
-  "Écriture CL-4"),
- ('4', "Rémunération de gérance de Stéphanie HOUVENAGHEL portée à 34 500 € au total", -15000.00,
+ ('2', "Ingénierie ERWAN BENALI passée du compte 2050000 à la charge 611 — part de l'exercice sur une convention de 25 000 €", -15000.00,
+  "Grand livre CFA, compte 611"),
+ ('3', "Rémunération de gérance de Stéphanie HOUVENAGHEL portée à 34 500 € au total", -15000.00,
   "Écriture CL-1, compte 644"),
- ('5', "Cotisations sociales TNS des gérants : 12 600,00 (Xavier) + 7 500,30 (Stéphanie)", -20100.30,
+ ('4', "Cotisations sociales TNS des gérants : 12 600,00 (Xavier) + 7 500,30 (Stéphanie)", -20100.30,
   "Écritures CL-2 et CL-3, compte 645.9"),
- ('6', "Factures non parvenues : les sept autres comptes fournisseurs débiteurs sont apurés", -4326.18,
+ ('5', "Factures non parvenues : les huit comptes fournisseurs débiteurs sont apurés", -4826.18,
   "Écriture CL-5"),
- ('7', "Carburant et entretien reportés au compte courant de Xavier GAUSSENS", 1383.01,
-  "Écriture CL-10, compte 4551"),
- ('8', "Produits acquis non encore facturés au 31/07/2026 (FAE)", 15289.58, "Écriture CL-7, compte 418"),
- ('9', "Produits constatés d'avance : part des factures portant sur l'exercice 2", -46427.02,
+ ('6', "Produits acquis non encore facturés au 31/07/2026 (FAE)", 15289.58, "Écriture CL-7, compte 418"),
+ ('7', "Produits constatés d'avance : part des factures portant sur l'exercice 2", -46427.02,
   "Écriture CL-6, compte 487"),
- ('10', "Facture LEMOLE-1 du 17/02/2026, absente du grand livre, réintégrée", 750.00,
+ ('8', "Facture LEMOLE-1 du 17/02/2026, absente du grand livre, réintégrée", 750.00,
   "Écriture CL-8, compte 411.2"),
 ]
 cum = 141950.06
@@ -337,14 +334,14 @@ r = header(ws, r, ['#', "Du résultat CFA au résultat annoncé par votre modèl
 ECARTS = [
  ('1', "Créances que le modèle retient au-delà de celles du grand livre (99 110,95 contre 79 752,95)",
   19358.00, "Aucune combinaison de factures du grand livre ne reconstitue 99 110,95."),
- ('2', "Concession ERWAN BENALI (15 000 €) : maintenue en immobilisation ici, passée en charge par le modèle",
-  -15000.00, "Point ouvert n° 1."),
+ ('2', "Compte d'attente 4710000 : le modèle en fait des charges, nous le conservons ouvert",
+  -18227.40, "Décision du 05/09/2026. Voir l'onglet « 14. Compte d'attente »."),
  ('3', "PC BOULANGER du 15/04/2026 : maintenu en immobilisation ici, passé en charge par le modèle",
-  -1299.99, "Point ouvert n° 2."),
+  -1299.99, "Point ouvert n° 1."),
  ('4', "Intérêts d'emprunt (3 255,77) et assurance emprunteur (725,73) : charges ici, absorbés dans le remboursement du prêt par le modèle",
   3981.50, "Le modèle impute l'échéance entière au compte 164."),
  ('5', "Dettes et créances de tiers non reprises et écarts de rattachement — effet de la base trésorerie du modèle",
-  11856.85, "Le modèle est bâti sur le relevé bancaire, le grand livre sur les droits constatés."),
+  13239.86, "Le modèle est bâti sur le relevé bancaire, le grand livre sur les droits constatés."),
 ]
 cum2 = RES
 r = row(ws, r, ['', "Résultat CFA de ce dossier", '', cum2, ''], ['', '', '', 'n', ''], bold=True)
@@ -442,21 +439,18 @@ ws, r = sheet('13. Points ouverts', 'Ce qui reste à trancher',
 r = header(ws, r, ['#', 'Sujet', 'Montant en jeu', 'Le constat', 'Ce que nous proposons'],
            [5, 40, 15, 80, 70], ['center', 'left', 'right', 'left', 'left'])
 POINTS = [
- ("Concession ERWAN BENALI", -15000.00,
-  "SECOGEST l'immobilise au compte 2050000 (15 000 €, facture du 25/02/2026). Votre modèle analytique la passe en charge au compte CFA 611 « Achats en sous-traitance (non pédagogique) ».",
-  "Nous l'avons maintenue en immobilisation : il s'agit d'une ingénierie, elle n'est pas laissée aux apprentis. La passer en charge coûterait 15 000 € de résultat."),
+ ("Convention ERWAN BENALI — suite sur l'exercice 2", None,
+  "La convention porte sur 25 000 €, dont 15 000 € facturés et réglés sur l'exercice 1 (facture du 25/02/2026). Ils sont passés en charge au compte 611.",
+  "Les 10 000 € restants relèvent de l'exercice 2 : rien à provisionner au 31/07/2026, la prestation correspondante n'est pas encore rendue. À suivre au prochain exercice."),
  ("PC BOULANGER du 15/04/2026", -1299.99,
   "SECOGEST l'immobilise au 2183000. Votre modèle passe en charge le virement de 1 746,44 € du 04/05/2026 qui l'a réglé.",
   "Nous l'avons maintenu en immobilisation, comme le second PC BOULANGER de juillet que votre modèle immobilise également."),
- ("Facture LEMOLE-1 de 750 €", 750.00,
-  "Votre modèle la porte en écriture de clôture (contrat CA-0274702-1, Jodie DUDING, Rugby Club Le Môle, 17/02/2026). Elle est absente du grand livre. Le grand livre porte deux autres factures de 750 € à la même date : SOC-1 (Stade Olympique Chambérien) et AURILLAC-2 (Stade Aurillacois), toutes deux encaissées.",
-  "Nous l'avons réintégrée (écriture CL-8) parce que votre dossier la distingue explicitement des deux autres. Merci de confirmer qu'elle existe bien et de nous adresser la pièce."),
+ ("Compte d'attente 4710000 — 18 227,40 €", -18227.40,
+  "Décision du 05/09/2026 : le compte reste ouvert, ses 93 opérations ne sont pas des charges de l'exercice. La plus grosse ligne est le lot « CARTE FACTURETTES CB » du 31/07/2026 (8 275,52 €), qui contient la réservation BOOKING de 1 341,46 € — annulée et remboursée le 16/07 : c'est la seule compensation du compte, elle ramène le lot à 6 934,06 € nets.",
+  "Le détail complet, ligne à ligne, figure à l'onglet « 14. Compte d'attente ». Chaque ligne y porte la nature que nous lui reconnaissons : le jour où les pièces arrivent, l'imputation est prête. En l'état, ces 18 227,40 € améliorent le résultat d'autant."),
  ("Créances de 99 110,95 € affirmées par le modèle", 19358.00,
   "Le grand livre porte 79 752,95 € de créances au 31/07/2026 (AFDAS 75 874,75 + AKTO 176,20 + OPCO 3 702,00). Les cinq factures AKTO du 28/07 sont couvertes à hauteur de 15 269,60 € par l'encaissement du 27/07.",
   "Nous avons retenu les 79 752,95 € du grand livre. Si les 99 110,95 € sont exacts, il manque des factures de vente au grand livre : merci de nous les transmettre."),
- ("Salaire de Julie HUCHET", None,
-  "Julie HUCHET n'apparaît au grand livre que par le remboursement de son PC (646,73 € le 07/07/2026). La paie de juillet 2026 est de 11 689,81 € contre 7 768,65 € en juin, soit 3 921,16 € de plus — ce qui correspond à une embauche.",
-  "Nous avons considéré qu'elle est déjà comprise dans l'OD de paie de juillet. Si ce n'est pas le cas, transmettez-nous son bulletin : la charge sera provisionnée sur juillet."),
  ("INTERSPORT — six cartes cadeaux de 50 €", -300.00,
   "SECOGEST les comptabilise au 6234000 « Cadeaux à la clientèle » avec le libellé « INTERSPORT CARTE KDO ». Votre modèle demande le 623.",
   "Nous avons retenu le 623 « Publicité, communication et promotion » : la récompense est la contrepartie d'un travail de communication. Le 6238 « dons et mécénat » reste défendable."),
@@ -485,3 +479,90 @@ finish(ws, cols=[5, 40, 15, 80, 70])
 
 wb.save('Analytique_CFA_WEFORM.xlsx')
 print('classeur terminé —', len(wb.sheetnames), 'onglets :', ', '.join(wb.sheetnames))
+
+# ============================ 14. COMPTE D'ATTENTE =================================
+import match as _match
+E_ALL = json.load(open('gl_cfa.json'))
+ATT = [e for e in E_ALL if e['compte'] == '4710000']
+_V = _match.charger_modele(cascade.XLSX)
+_match.apparier(ATT, _V)
+LOT = [
+ ('AIRBNB HM8DPE — hébergement des apprentis',                 2294.08, '6257'),
+ ("BOOKING — réservation d'hôtel, annulée et remboursée le 16/07", 1341.46, '6256.9'),
+ ('Déplacements et restauration de juillet',                    1436.64, '6256.9'),
+ ('Abonnements SaaS de juillet',                                 760.06, '6156.9'),
+ ('SCORM ALABOS — deux achats de cours (02/07 et 18/07)',        700.00, '6022.2'),
+ ("CENTRAL AUTOS — entretien du véhicule",                       597.76, '615'),
+ ("Abonnements IA de juillet",                                   487.03, '6156.2'),
+ ('Fournitures — CULTURA, LECLERC, Action',                      377.99, '6064'),
+ ('KEYYO — téléphonie',                                          257.50, '626'),
+ ('MOB COWORKING — usage ponctuel',                               23.00, '6132.9'),
+]
+ws, r = sheet("14. Compte d'attente", "Compte d'attente 4710000 — 18 227,40 € laissés en attente",
+              "Le compte reste ouvert : ces 93 opérations ne pèsent pas sur le résultat de l'exercice. "
+              "Chacune porte ici la nature que nous lui reconnaissons — l'imputation est prête pour le jour "
+              "où les pièces arrivent.")
+r = header(ws, r, ['Les grosses sommes', 'Montant', 'Ce que nous en savons'],
+           [46, 15, 100], ['left', 'right', 'left'])
+GROS = [
+ ("Lot « CARTE FACTURETTES CB » du 31/07/2026", 8275.52,
+  "Les achats carte de juillet en un seul bloc. Le détail de juillet de votre modèle le décompose au centime "
+  "(tableau ci-dessous). Il contient la réservation BOOKING de 1 341,46 € — c'est la seule ligne du compte "
+  "qui se compense : elle a été annulée et remboursée le 16/07. Le lot pèse donc 6 934,06 € nets."),
+ ("Note de frais de juillet — Xavier GAUSSENS", 2993.88,
+  "Virement du 20/07/2026, libellé « FRAIS JUILLET RECAP ». Aucune note détaillée au dossier."),
+ ("Quai des Lanternes — séminaire de clôture", 2076.33,
+  "Deux versements : acompte de 1 344,35 € le 16/07 et solde de 731,98 € le 31/07. Même fournisseur, même "
+  "objet : la facture couvrira les deux."),
+ ("BOOKING — remboursement de la réservation", -1341.46,
+  "SEULE COMPENSATION DU COMPTE. Elle annule exactement la charge BOOKING logée dans le lot carte ci-dessus."),
+ ("Carburant et entretien du véhicule", 1466.10,
+  "18 lignes sur tout l'exercice (TOTAL, ESSO, AGIP, CRAUSAZ, STATION CALAO, MIDAS, LAVAGE BRESSAN, VW Bank). "
+  "Votre modèle analytique les reporte au compte courant de Xavier GAUSSENS ; en les laissant en attente, "
+  "elles ne pèsent déjà pas sur le résultat."),
+ ("Auto-école NOUGARET — aide au permis", 500.00,
+  "Virement du 17/01/2026. Relève du compte 6251 « déplacements des apprentis — mobilité »."),
+ ("Remboursement de frais de PC", 500.00,
+  "Virement du 09/04/2026. Se rattache au lot de PC des apprentis (compte 6068)."),
+ ("Note de frais de juillet — Stéphanie HOUVENAGHEL", 403.93,
+  "Virement du 20/07/2026. Aucune note détaillée au dossier."),
+ ("Restauration et petits achats sans facture", 3082.86,
+  "73 lignes de moins de 180 € : restaurants, péages, courses, tickets CB. Le grand livre les libelle lui-même "
+  "« PAS DE FACTURE » ou « TICKET CB »."),
+]
+for lab, m, com in GROS:
+    r = row(ws, r, [lab, m, com], ['', 'n', 'w'], color=(BRIQUE if m < 0 else None))
+r = total(ws, r, ['TOTAL DU COMPTE D\'ATTENTE AU 31/07/2026', 18227.40, ''], ['', 'n', ''])
+r += 1
+r = header(ws, r, ['Décomposition du lot « CARTE FACTURETTES CB » du 31/07/2026', 'Montant', 'Compte CFA visé'],
+           None, ['left', 'right', 'center'])
+for lab, m, cfa in LOT:
+    r = row(ws, r, [lab, m, cfa], ['', 'n', 'c'])
+r = total(ws, r, ['Total du lot', round(sum(x[1] for x in LOT), 2), ''], ['', 'n', ''])
+r = row(ws, r, ['dont BOOKING, annulé et remboursé le 16/07', -1341.46, ''], ['', 'n', ''], color=BRIQUE)
+r = total(ws, r, ['Charge nette du lot', round(sum(x[1] for x in LOT) - 1341.46, 2), ''], ['', 'n', ''])
+r = note(ws, r, "Cette décomposition est reconstituée à partir du détail de juillet de votre propre modèle "
+                "analytique : elle boucle au centime sur les 8 275,52 € du grand livre. Le relevé carte de "
+                "juillet 2026 la confirmerait définitivement.", 3)
+r += 1
+r = header(ws, r, ['Date', 'Libellé du grand livre', 'Montant', 'Nature reconnue', 'Clé analytique'],
+           [11, 62, 14, 46, 26], ['center', 'left', 'right', 'left', 'left'])
+def _d(e):
+    j, mo, a = e['date'].split('/'); return (a, mo, j)
+tot_att = 0.0
+for e in sorted(ATT, key=_d):
+    m = round((e['debit'] or 0) - (e['credit'] or 0), 2); tot_att += m
+    mt = e.get('match')
+    cfa = mt['cfa'] if mt else ''
+    nat = (cfa + ' — ' + plan_cfa.PLAN.get(cfa, '')) if cfa in plan_cfa.PLAN else \
+          ('à ventiler — voir la décomposition ci-dessus' if 'CARTE FACTURETTES' in e['libelle'].upper()
+           else 'à identifier')
+    r = row(ws, r, [e['date'], e['libelle'], m, nat, (mt['cle'] if mt else '')],
+            ['c', '', 'n', '', ''], color=(BRIQUE if m < 0 else None))
+r = total(ws, r, ['', f'TOTAL — {len(ATT)} opérations', round(tot_att, 2), '', ''], ['', '', 'n', '', ''])
+r = note(ws, r, "La colonne « Nature reconnue » est celle que votre propre modèle analytique donne à chaque "
+                "opération : 91 des 93 lignes s'y apparient au centime et à la date. Rien n'est comptabilisé "
+                "tant que les pièces ne sont pas produites.", 5)
+finish(ws, freeze='A4')
+wb.save('Analytique_CFA_WEFORM.xlsx')
+print('onglet compte d\'attente ajouté —', len(wb.sheetnames), 'onglets')

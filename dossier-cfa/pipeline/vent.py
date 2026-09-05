@@ -27,8 +27,6 @@ CLES_CLOTURE = {          # (référence, compte CFA) -> (nom de la clé, pource
  ('CL-8', '706.11'): ('Apprentissage',      [100, 0, 0, 0, 0]),
  ('CL-9', '706.11'): ('Apprentissage',      [100, 0, 0, 0, 0]),
  ('CL-9', '706.21'):  ('FPC',               [0, 100, 0, 0, 0]),
- ('CL-10', '6256.9'): ('Hors périmètre',    [0, 0, 0, 0, 100]),
- ('CL-10', '615'):    ('Hors périmètre',    [0, 0, 0, 0, 100]),
 }
 
 def defauts(V):

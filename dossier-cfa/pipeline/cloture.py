@@ -82,33 +82,10 @@ def journal(E):
         motif="Calculées sur la totalité de la rémunération décidée (34 500,00 €).")
     add('CL-3', '438',   "CHARGES SOCIALES SUR REMUNERATION DE GERANCE - STEPHANIE HOUVENAGHEL", cre=7500.30, motif="Contrepartie.")
 
-    # CL-4 — ventilation du compte d'attente : chaque ligne hérite de la clé du modèle
-    att = [e for e in E if e['compte'] == '4710000' and e['cfa'] == '471']
-    V = match.charger_modele(XLSX)
-    match.apparier(att, V)
-    def pose(mt):
-        if not mt: return None, None
-        t = sum(abs(x) for x in mt['axes'])
-        return mt['cle'], ([round(100*abs(x)/t, 4) for x in mt['axes']] if t else None)
-    tot471 = 0.0
-    for e in att:
-        amt = round((e['debit'] or 0) - (e['credit'] or 0), 2)
-        lib = e['libelle']
-        if 'CARTE FACTURETTES' in lib.upper():
-            for cfa, m, why, cle, pct in LOT_CB:
-                add('CL-4', cfa, f"CARTE FACTURETTES CB 07/2026 - {why.upper()}", deb=m,
-                    motif="Lot carte de juillet 2026 décomposé d'après le détail de juillet du modèle analytique WE-FORM.")
-                ec[-1]['cle'], ec[-1]['pct'] = cle, pct
-                tot471 += m
-            continue
-        cfa = '6256.9'
-        for pat, c in VENT_471.items():
-            if re.search(pat, lib, re.I): cfa = c; break
-        add('CL-4', cfa, lib, deb=amt, motif="Ventilation du compte d'attente.")
-        ec[-1]['cle'], ec[-1]['pct'] = pose(e.get('match'))
-        tot471 += amt
-    add('CL-4', '471', "SOLDE DU COMPTE D'ATTENTE AU 31/07/2026", cre=round(tot471, 2),
-        motif="Le compte d'attente est soldé : les 93 opérations rejoignent leur compte de charge.")
+    # CL-4 — SUPPRIMÉE : le compte d'attente 4710000 est CONSERVÉ tel quel.
+    # Décision du 05/09/2026 : ses 93 opérations restent en attente d'imputation ;
+    # elles ne sont donc pas des charges de l'exercice. Le détail figure à l'onglet
+    # « 14. Compte d'attente » du dossier analytique.
 
     # CL-5 — factures non parvenues (soldes débiteurs fournisseurs)
     for aux, cfa, m, why in FNP:
@@ -136,13 +113,9 @@ def journal(E):
         motif="Reste à charge employeur sur le contrat CA-0274702-1 ; facture absente du grand livre.",
         section='CLIENTS', aux='CLEMOLE', aux_lib='RUGBY CLUB LE MOLE')
     add('CL-8', '706.11', "FACTURE LEMOLE-1 DU 17/02/2026 - RUGBY CLUB LE MOLE - J. DUDING", cre=750.00, motif="Contrepartie.")
-    # CL-10 — dépenses personnelles reportées au compte courant du gérant
-    add('CL-10', '4551', "CARBURANT ET ENTRETIEN - COMPTE COURANT XAVIER GAUSSENS", deb=1383.01,
-        motif="Reclassement décidé au dossier analytique : ces dépenses ne sont pas incorporables.")
-    add('CL-10', '6256.9', "CARBURANT - REPORTE AU COMPTE COURANT DE XAVIER GAUSSENS", cre=1363.01,
-        motif="Sortie des charges de l'exercice.")
-    add('CL-10', '615',    "MIDAS - REPORTE AU COMPTE COURANT DE XAVIER GAUSSENS", cre=20.00,
-        motif="Sortie des charges de l'exercice.")
+    # CL-10 — SUPPRIMÉE : le carburant et l'entretien du véhicule (1 466,10 €) sont
+    # intégralement logés au compte d'attente, qui reste ouvert. Ils ne pèsent donc
+    # déjà pas sur le résultat : aucun report au compte courant n'est nécessaire.
 
     # CL-9 — reclassement de la part formation continue des financements AFDAS
     add('CL-9', '706.11', "RECLASSEMENT FPC - PART FORMATION CONTINUE DES FINANCEMENTS AFDAS", deb=64176.54,
