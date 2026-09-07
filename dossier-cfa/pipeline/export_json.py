@@ -101,6 +101,120 @@ def mat_idx():
 AX = [round(sum(l['axes'][i] for l in R), 2) for i in range(5)]
 CAS = cascade.repartir(AX)
 
+
+# ================= décompte des contrats, courts contrats, rattachement, direct/indirect =========
+import datetime as _dt, statistics as _st
+import contrats as _ct
+CTR  = _ct.contrats()
+MENS = _ct.effectif_mensuel(CTR)
+
+def _dd(s):
+    try: return _dt.date.fromisoformat(s)
+    except (TypeError, ValueError): return None
+
+_DEB, _FIN = _dt.date(2025, 4, 17), _dt.date(2026, 7, 31)
+
+def _duree(s):
+    d, f = _dd(s['debut']), _dd(s['fin'])
+    if not (d and f): return None, None
+    return round((f - d).days / 30.44, 2), round(max(0, (min(f, _FIN) - max(d, _DEB)).days) / 30.44, 2)
+
+# --- lignes du grand livre qui citent nommément un stagiaire (drill-down du nom)
+_STOP = {'JEAN', 'MARIE', 'PIERRE', 'PAUL', 'LOUIS', 'FRANCE', 'PARIS', 'CLUB', 'SPORT',
+         'FORMATION', 'GROUPE', 'SAINT', 'MONT', 'BLANC', 'ROUGE', 'PETIT', 'GRAND'}
+def _tokens(nom):
+    return [t for t in re.split(r"[^A-Za-zÀ-ÿ']+", (nom or '').upper())
+            if len(t) >= 5 and t not in _STOP]
+_LIBUP = [re.sub(r"[^A-Z0-9À-Ý]+", ' ', (l['libelle'] or '').upper()) for l in R]
+def _lignes_du_nom(nom):
+    tk = _tokens(nom)
+    if not tk: return []
+    return [i for i, u in enumerate(_LIBUP) if any(f' {t} ' in f' {u} ' for t in tk)]
+
+# [nom, code titre, intitulé, début, fin, durée, mois_ex, prise_en_charge, charges_nom, lignes_modele, idx_gl]
+STAGJ = []
+for s in sorted(STAG, key=lambda s: (-s['prise_en_charge'], s['nom'] or '')):
+    du, mx = _duree(s)
+    STAGJ.append([s['nom'], s['titre'], s['intitule'], s['debut'], s['fin'], du, mx,
+                  round(s['prise_en_charge'], 2), round(s['charges_nominatives'], 2),
+                  s['lignes'], _lignes_du_nom(s['nom'])])
+
+# --- 15. décompte
+_TITC = sorted({c['titre'] for c in CTR})
+DECOMPTE = {
+  'reperes': [["Contrats de l'exercice", len(CTR)],
+              ['Effectif maximal atteint', max(m['presents'] for m in MENS)],
+              ['Durée moyenne (mois)', round(_st.mean([c['duree'] for c in CTR]), 2)],
+              ['Durée médiane (mois)', round(_st.median([c['duree'] for c in CTR]), 2)],
+              ["Mois-apprenti dans l'exercice", round(sum(c['mois_ex'] for c in CTR), 2)],
+              ["Contrats qui débordent sur l'exercice 2", sum(1 for c in CTR if c['deborde'])]],
+  'titres_cols': _TITC,
+  'mensuel': [[m['mois'], m['presents'], m['entrees'], m['sorties']] +
+              [m['titres'].get(t, 0) for t in _TITC] for m in MENS],
+  'par_titre': [[t, len([c for c in CTR if c['titre'] == t]),
+                 round(sum(c['prise_en_charge'] for c in CTR if c['titre'] == t), 2),
+                 round(sum(c['charges_nominatives'] for c in CTR if c['titre'] == t), 2),
+                 round(_st.mean([c['duree'] for c in CTR if c['titre'] == t]), 2),
+                 round(sum(c['mois_ex'] for c in CTR if c['titre'] == t), 2)] for t in _TITC],
+}
+
+# --- 16. courts contrats
+_SEUIL = 6.0
+COURTS = {
+  'seuil': _SEUIL,
+  'contrats': [[c['nom'], c['titre'], c['intitule'], c['debut'], c['fin'], c['duree'],
+                round(c['prise_en_charge'], 2), round(c['charges_nominatives'], 2),
+                round(c['prise_en_charge'] / c['duree'], 2) if c['duree'] else None,
+                _lignes_du_nom(c['nom'])]
+               for c in sorted([c for c in CTR if c['duree'] < _SEUIL], key=lambda c: c['duree'])],
+  'tranches': [[lab, len([c for c in CTR if lo <= c['duree'] < hi]),
+                round(sum(c['prise_en_charge'] for c in CTR if lo <= c['duree'] < hi), 2)]
+               for lo, hi, lab in [(0,3,'moins de 3 mois'),(3,6,'3 à 6 mois'),(6,9,'6 à 9 mois'),
+                                   (9,12,'9 à 12 mois'),(12,99,'12 mois et plus')]],
+  'total_pec': round(sum(c['prise_en_charge'] for c in CTR), 2),
+}
+
+# --- 17. rattachement d'exercice
+_CHEV = sorted([c for c in CTR if c['deborde']], key=lambda c: -c['prise_en_charge'])
+RATT = {
+  'contrats': [[c['nom'], c['titre'], c['debut'], c['fin'], c['duree'], c['mois_ex'],
+                round(c['duree'] - c['mois_ex'], 2), round(100 * c['part_ex'], 2),
+                round(c['prise_en_charge'], 2), _lignes_du_nom(c['nom'])] for c in _CHEV],
+  'ecritures': [["Produits constatés d'avance", '487', -46427.02,
+                 "La part des factures déjà émises qui porte sur l'exercice 2. Elle sort du résultat de l'exercice 1."],
+                ["Produits acquis non encore facturés", '418', 15289.58,
+                 "L'enseignement déjà dispensé au 31/07/2026 que le financeur n'a pas encore été appelé à payer. Il entre dans le résultat."],
+                ["Solde net du rattachement", '', -31137.44,
+                 "Effet net sur le résultat de l'exercice 1."]],
+  # indices des lignes de clôture qui portent le rattachement (côté résultat)
+  'idx': [i for i, l in enumerate(R) if str(l.get('piece', '')) in ('CL-6', 'CL-7', 'CL-8')],
+  'idx_ecr': [[i for i, l in enumerate(R) if str(l.get('piece', '')) == pc]
+              for pc in ('CL-6', 'CL-7')] + [[i for i, l in enumerate(R)
+                                              if str(l.get('piece', '')) in ('CL-6', 'CL-7')]],
+}
+
+# --- 18. charges directes et indirectes
+def _nature(l):
+    if l['cfa'][0] == '7': return 'Produit'
+    p = l['pct']
+    if p[4] >= 99.9: return 'Hors périmètre'
+    if p[3] >= 99.9: return 'Indirecte — commun pur'
+    if p[3] > 0.01:  return 'Indirecte — répartie par clé'
+    return 'Directe'
+_NAT = ['Directe', 'Indirecte — répartie par clé', 'Indirecte — commun pur', 'Hors périmètre', 'Produit']
+_gn = collections.defaultdict(list)
+for i, l in enumerate(R): _gn[(l['cfa'], _nature(l))].append(i)
+DIRIND = {
+  'natures': _NAT,
+  'comptes': [[code, plan_cfa.PLAN.get(code, '')] +
+              [[round(sum(R[i]['montant'] for i in _gn.get((code, n), [])), 2),
+                _gn.get((code, n), [])] for n in _NAT]
+              for code in plan_cfa.ORDRE if any((code, n) in _gn for n in _NAT)],
+  'synthese': [[n, sum(len(v) for k, v in _gn.items() if k[1] == n),
+                round(sum(R[i]['montant'] for k, v in _gn.items() if k[1] == n for i in v), 2),
+                [i for k, v in _gn.items() if k[1] == n for i in v]] for n in _NAT],
+}
+
 DATA = {
  'lignes': LIG,
  'plan': plan_cfa.PLAN,
@@ -114,10 +228,10 @@ DATA = {
  'materiel': mat_idx(),
  'immo': [[l['cfa'], l['libelle'], -round((l['debit'] or 0) - (l['credit'] or 0), 2)]
           for l in L if l['cfa'] in ('2183',)],
- 'stagiaires': [[s['nom'], s['titre_contrat'], s['titre'], s['prise_en_charge'],
-                 s['charges_nominatives'], s['lignes']] for s in STAG],
+ 'stagiaires': STAGJ,
  'titres': [[t['code'], t['nom'], t['contrats'], t['mois'], t['produits_modele'], t['direct_modele']]
             for t in TIT],
+ 'decompte': DECOMPTE, 'courts': COURTS, 'ratt': RATT, 'dirind': DIRIND,
  'axes': AX, 'cascade': CAS, 'resultat': BAL['resultat'], 'balance': BAL,
  'cle1': cascade.CLE1_AURA, 'cle2': cascade.CLE2_FPC, 'qpaura': cascade.QP_AURA,
 }

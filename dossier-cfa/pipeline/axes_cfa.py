@@ -134,6 +134,10 @@ def stagiaires():
         def num(x):
             try: return float(x)
             except (TypeError, ValueError): return 0.0
-        out.append({'nom': r[0], 'titre_contrat': r[1], 'titre': r[2],
-                    'prise_en_charge': num(r[3]), 'charges_nominatives': num(r[4]), 'lignes': int(num(r[5]))})
+        # colonnes réelles : Stagiaire · Titre · Intitulé du contrat · Début · Fin ·
+        #                    Prise en charge · Charges nominatives · Lignes · Réserve
+        out.append({'nom': r[0], 'titre': r[1], 'intitule': r[2],
+                    'debut': str(r[3])[:10] if r[3] else '', 'fin': str(r[4])[:10] if r[4] else '',
+                    'prise_en_charge': num(r[5]), 'charges_nominatives': num(r[6]),
+                    'lignes': int(num(r[7])), 'reserve': r[8] if len(r) > 8 else None})
     return out

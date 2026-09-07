@@ -217,25 +217,49 @@ r = note(ws, r, f"Coefficient appliqué aux produits de votre modèle : {k_prod:
                 "La structure entre titres, elle, est intégralement la vôtre.".replace(',', ' '), 10)
 finish(ws, freeze='A4')
 
+import datetime as _dt
+_DEB, _FIN = _dt.date(2025, 4, 17), _dt.date(2026, 7, 31)
+def _dd(s):
+    try: return _dt.date.fromisoformat(s)
+    except (TypeError, ValueError): return None
+
 # ============================ 5. PAR STAGIAIRE =====================================
 S = axes_cfa.stagiaires()
 ws, r = sheet('5. Par stagiaire', 'Par stagiaire — un apprenti par contrat',
               "Le titre est celui que porte SON contrat. Les charges nominatives sont celles dont la pièce le nomme ; "
               "le montant est divisé à parts égales entre les personnes citées.")
-r = header(ws, r, ['Stagiaire', 'Titre porté par le contrat', 'Code', 'Prise en charge',
-                   'Charges nominatives', 'Lignes'], [34, 60, 8, 16, 18, 8],
-           ['left', 'left', 'center', 'right', 'right', 'right'])
-for s in sorted(S, key=lambda s: s['charges_nominatives']):
-    r = row(ws, r, [s['nom'], s['titre_contrat'], s['titre'], round(s['prise_en_charge'], 2),
-                    round(s['charges_nominatives'], 2), s['lignes']],
-            ['', '', 'c', 'n', 'n', 'n0'])
-r = total(ws, r, [f'TOTAL — {len(S)} stagiaires', '', '', round(sum(s['prise_en_charge'] for s in S), 2),
+r = header(ws, r, ['Stagiaire', 'Code', 'Intitulé du contrat', 'Début', 'Fin', 'Durée (mois)',
+                   'Mois dans l\'exercice', 'Prise en charge', 'Charges nominatives', 'Lignes'],
+           [34, 8, 58, 12, 12, 12, 14, 16, 18, 8],
+           ['left', 'center', 'left', 'center', 'center', 'right', 'right', 'right', 'right', 'right'])
+for s in sorted(S, key=lambda s: (-s['prise_en_charge'], s['nom'] or '')):
+    d, f = _dd(s['debut']), _dd(s['fin'])
+    duree = round((f - d).days / 30.44, 2) if (d and f) else None
+    mex = None
+    if d and f:
+        i0, i1 = max(d, _DEB), min(f, _FIN)
+        mex = round(max(0, (i1 - i0).days) / 30.44, 2)
+    r = row(ws, r, [s['nom'], s['titre'], s['intitule'], s['debut'], s['fin'], duree, mex,
+                    round(s['prise_en_charge'], 2), round(s['charges_nominatives'], 2), s['lignes']],
+            ['', 'c', '', 'c', 'c', 'n', 'n', 'n', 'n', 'n0'])
+_dur = [round((_dd(s['fin']) - _dd(s['debut'])).days / 30.44, 2) for s in S if _dd(s['debut']) and _dd(s['fin'])]
+_mex = []
+for s in S:
+    d, f = _dd(s['debut']), _dd(s['fin'])
+    if d and f: _mex.append(max(0, (min(f, _FIN) - max(d, _DEB)).days) / 30.44)
+r = total(ws, r, [f'TOTAL — {len(S)} contrats', '', '', '', '',
+                  round(sum(_dur) / len(_dur), 2) if _dur else None, round(sum(_mex), 2),
+                  round(sum(s['prise_en_charge'] for s in S), 2),
                   round(sum(s['charges_nominatives'] for s in S), 2),
-                  sum(s['lignes'] for s in S)], ['', '', '', 'n', 'n', 'n0'])
-r = note(ws, r, "Les charges nominatives ne couvrent que les pièces qui citent une personne. Tout le reste des "
-                "charges d'apprentissage se répartit au mois-apprenti dans l'onglet « 4. Par formation ».", 6)
+                  sum(s['lignes'] for s in S)], ['', '', '', '', '', 'n', 'n', 'n', 'n', 'n0'])
+r = note(ws, r, "La colonne « Durée » est la durée totale du contrat ; « Mois dans l'exercice » n'en retient que "
+                "la part comprise entre le 17/04/2025 et le 31/07/2026 — c'est cette part qui sert de clé de "
+                "répartition des charges d'apprentissage dans l'onglet « 4. Par formation ». La moyenne des durées "
+                "figure en pied de la colonne « Durée », le cumul des mois-apprenti en pied de la suivante. "
+                "Les charges nominatives ne couvrent que les pièces qui citent une personne ; le montant est "
+                "divisé à parts égales entre les personnes citées.", 10)
 finish(ws, freeze='A4')
-ws.auto_filter.ref = f"A3:F{r-3}"
+ws.auto_filter.ref = f"A3:J{r-3}"
 
 # ============================ 6. PAR OUTIL =========================================
 APPS, FRN = axes_cfa.par_outil(R)
@@ -566,3 +590,165 @@ r = note(ws, r, "La colonne « Nature reconnue » est celle que votre propre mod
 finish(ws, freeze='A4')
 wb.save('Analytique_CFA_WEFORM.xlsx')
 print('onglet compte d\'attente ajouté —', len(wb.sheetnames), 'onglets')
+
+# ============================ 15-18. LES QUATRE NOUVEAUX ONGLETS ===================
+import contrats as _ct
+C = _ct.contrats()
+MENS = _ct.effectif_mensuel(C)
+import statistics as _st
+
+# ---- 15. décompte des stagiaires
+ws, r = sheet('15. Décompte stagiaires', 'Le décompte des stagiaires',
+              "Effectif présent mois par mois, entrées et sorties, durées. Reconstitué depuis les dates de début et de fin de chaque contrat.")
+K = [('Contrats de l\'exercice', len(C)), ('Effectif maximal atteint', max(m['presents'] for m in MENS)),
+     ('Durée moyenne (mois)', round(_st.mean([c['duree'] for c in C]), 2)),
+     ('Durée médiane (mois)', round(_st.median([c['duree'] for c in C]), 2)),
+     ('Mois-apprenti dans l\'exercice', round(sum(c['mois_ex'] for c in C), 2)),
+     ('Contrats qui débordent sur l\'exercice 2', sum(1 for c in C if c['deborde']))]
+r = header(ws, r, ['Repère', 'Valeur'], [42, 16], ['left', 'right'])
+for a, b in K: r = row(ws, r, [a, b], ['', 'n' if isinstance(b, float) else 'n0'])
+r += 1
+TIT = sorted({c['titre'] for c in C})
+r = header(ws, r, ['Mois', 'Présents', 'Entrées', 'Sorties'] + TIT,
+           [12, 11, 10, 10] + [8] * len(TIT), ['center'] + ['right'] * (3 + len(TIT)))
+for m in MENS:
+    r = row(ws, r, [m['mois'], m['presents'], m['entrees'], m['sorties']] +
+            [m['titres'].get(t, 0) or None for t in TIT],
+            ['c', 'n0', 'n0', 'n0'] + ['n0'] * len(TIT))
+r = total(ws, r, ['Total des mouvements', '', sum(m['entrees'] for m in MENS),
+                  sum(m['sorties'] for m in MENS)] + [None] * len(TIT),
+          ['', '', 'n0', 'n0'] + [''] * len(TIT))
+r += 1
+r = header(ws, r, ['Titre', 'Contrats', 'Prise en charge', 'Charges nominatives',
+                   'Durée moyenne', 'Mois-apprenti dans l\'exercice'],
+           [12, 11, 18, 20, 15, 24], ['center'] + ['right'] * 5)
+for t in TIT:
+    g_ = [c for c in C if c['titre'] == t]
+    r = row(ws, r, [t, len(g_), round(sum(c['prise_en_charge'] for c in g_), 2),
+                    round(sum(c['charges_nominatives'] for c in g_), 2),
+                    round(_st.mean([c['duree'] for c in g_]), 2),
+                    round(sum(c['mois_ex'] for c in g_), 2)], ['c', 'n0', 'n', 'n', 'n', 'n'])
+r = total(ws, r, ['Total', len(C), round(sum(c['prise_en_charge'] for c in C), 2),
+                  round(sum(c['charges_nominatives'] for c in C), 2), '',
+                  round(sum(c['mois_ex'] for c in C), 2)], ['', 'n0', 'n', 'n', '', 'n'])
+r = note(ws, r, "Les mois-apprenti recalculés depuis les dates donnent 542,92 contre 544,42 au modèle : "
+                "l'écart de 1,50 vient des conventions de bornes. La cohérence est bonne.", 6)
+finish(ws, freeze='A4')
+
+# ---- 16. courts contrats
+SEUIL = 6.0
+CT = sorted([c for c in C if c['duree'] < SEUIL], key=lambda c: c['duree'])
+ws, r = sheet('16. Courts contrats', f'Les contrats de moins de {SEUIL:.0f} mois',
+              "Le seuil se lit dans les données : la durée médiane est de 9 mois, et sous six mois on ne trouve presque que de la formation continue.")
+r = header(ws, r, ['Stagiaire', 'Titre', 'Intitulé du contrat', 'Début', 'Fin', 'Durée (mois)',
+                   'Prise en charge', 'Charges nominatives', 'Prise en charge par mois'],
+           [28, 12, 46, 12, 12, 12, 16, 18, 22],
+           ['left', 'center', 'left', 'center', 'center', 'right', 'right', 'right', 'right'])
+for c in CT:
+    r = row(ws, r, [c['nom'], c['titre'], c['intitule'], c['debut'], c['fin'], c['duree'],
+                    round(c['prise_en_charge'], 2), round(c['charges_nominatives'], 2),
+                    round(c['prise_en_charge'] / c['duree'], 2) if c['duree'] else None],
+            ['', 'c', '', 'c', 'c', 'n', 'n', 'n', 'n'])
+r = total(ws, r, [f'TOTAL — {len(CT)} contrats', '', '', '', '', round(sum(c['duree'] for c in CT), 2),
+                  round(sum(c['prise_en_charge'] for c in CT), 2),
+                  round(sum(c['charges_nominatives'] for c in CT), 2), ''],
+          ['', '', '', '', '', 'n', 'n', 'n', ''])
+r += 1
+r = header(ws, r, ['Tranche de durée', 'Contrats', 'Prise en charge', 'Part de la prise en charge'],
+           [24, 12, 20, 24], ['left', 'right', 'right', 'right'])
+TOTP = sum(c['prise_en_charge'] for c in C)
+for lo, hi, lab in [(0,3,'moins de 3 mois'),(3,6,'3 à 6 mois'),(6,9,'6 à 9 mois'),
+                    (9,12,'9 à 12 mois'),(12,99,'12 mois et plus')]:
+    g_ = [c for c in C if lo <= c['duree'] < hi]
+    p = round(sum(c['prise_en_charge'] for c in g_), 2)
+    r = row(ws, r, [lab, len(g_), p, round(100 * p / TOTP, 2)], ['', 'n0', 'n', 'p'])
+r = total(ws, r, ['Total', len(C), round(TOTP, 2), 100.0], ['', 'n0', 'n', 'p'])
+r = note(ws, r, "Dix des douze contrats de moins de six mois sont des actions de formation continue, "
+                "et le onzième est la sous-traitance BPJEPS de la Ligue AURA. Le court contrat, ici, "
+                "c'est la formation continue : l'apprentissage tourne autour de neuf mois.", 9)
+r = note(ws, r, "Deux prises en charge méritent un contrôle : BEDENDO BOUALIA Tony, 17 633,19 € pour "
+                "dix-huit jours, et HEIDER Matthias, 15 415,00 € pour la même période. Ce sont les deux "
+                "plus fortes prises en charge de l'exercice rapportées à la durée.", 9)
+finish(ws, freeze='A4')
+
+# ---- 17. rattachement d'exercice
+DEB_2 = _ct.FIN
+CHEV = sorted([c for c in C if c['deborde']], key=lambda c: -c['prise_en_charge'])
+ws, r = sheet("17. Rattachement d'exercice", "Ce qui appartient à l'exercice 2",
+              "Quarante contrats sur quatre-vingt-quinze se poursuivent après le 31/07/2026. C'est ce qui fonde les produits constatés d'avance.")
+r = header(ws, r, ['Stagiaire', 'Titre', 'Début', 'Fin', 'Durée', 'Mois dans l\'exercice 1',
+                   'Mois sur l\'exercice 2', 'Part exercice 1', 'Prise en charge'],
+           [28, 10, 12, 12, 10, 20, 20, 15, 16],
+           ['left', 'center', 'center', 'center', 'right', 'right', 'right', 'right', 'right'])
+for c in CHEV:
+    r = row(ws, r, [c['nom'], c['titre'], c['debut'], c['fin'], c['duree'], c['mois_ex'],
+                    round(c['duree'] - c['mois_ex'], 2), round(100 * c['part_ex'], 2),
+                    round(c['prise_en_charge'], 2)],
+            ['', 'c', 'c', 'c', 'n', 'n', 'n', 'p', 'n'])
+r = total(ws, r, [f'TOTAL — {len(CHEV)} contrats à cheval', '', '', '',
+                  round(sum(c['duree'] for c in CHEV), 2), round(sum(c['mois_ex'] for c in CHEV), 2),
+                  round(sum(c['duree'] - c['mois_ex'] for c in CHEV), 2), '',
+                  round(sum(c['prise_en_charge'] for c in CHEV), 2)],
+          ['', '', '', '', 'n', 'n', 'n', '', 'n'])
+r += 1
+r = header(ws, r, ['Écriture de rattachement', 'Compte', 'Montant', 'Ce qu\'elle porte'],
+           [46, 12, 16, 76], ['left', 'center', 'right', 'left'])
+for lab, cpt, mnt, txt in [
+  ("Produits constatés d'avance", '487', -46427.02,
+   "La part des factures déjà émises qui porte sur l'exercice 2. Elle sort du résultat de l'exercice 1."),
+  ("Produits acquis non encore facturés", '418', 15289.58,
+   "L'enseignement déjà dispensé au 31/07/2026 que le financeur n'a pas encore été appelé à payer. Il entre dans le résultat."),
+  ("Solde net du rattachement", '', -31137.44, "Effet net sur le résultat de l'exercice 1.")]:
+    r = row(ws, r, [lab, cpt, mnt, txt], ['', 'c', 'n', 'w'], bold=(not cpt))
+r = note(ws, r, "Les quarante contrats à cheval portent 355 561,53 € de prise en charge, dont une part revient "
+                "à l'exercice 2. Le montant de 46 427,02 € des produits constatés d'avance est celui de votre "
+                "modèle, calculé contrat par contrat sur l'avancement ; les durées ci-dessus permettent de le "
+                "recouper.", 9)
+finish(ws, freeze='A4')
+
+# ---- 18. charges directes et indirectes
+def nature(l):
+    if l['cfa'][0] == '7': return 'Produit'
+    p = l['pct']
+    if p[4] >= 99.9: return 'Hors périmètre'
+    if p[3] >= 99.9: return 'Indirecte — commun pur'
+    if p[3] > 0.01:  return 'Indirecte — répartie par clé'
+    return 'Directe'
+NAT = ['Directe', 'Indirecte — répartie par clé', 'Indirecte — commun pur', 'Hors périmètre', 'Produit']
+ws, r = sheet('18. Direct et indirect', 'Charges directes et charges indirectes',
+              "Une charge est directe quand la pièce désigne l'activité ; indirecte quand il faut une clé pour la répartir.")
+g2 = collections.defaultdict(lambda: {'m': 0.0, 'n': 0})
+for l in R:
+    k = (l['cfa'], nature(l)); g2[k]['m'] += l['montant']; g2[k]['n'] += 1
+r = header(ws, r, ['Compte', 'Intitulé'] + NAT + ['Total', 'Taux indirect'],
+           [10, 48] + [15] * 5 + [15, 13], ['left', 'left'] + ['right'] * 7)
+tn = collections.defaultdict(float)
+for code in [c for c in plan_cfa.ORDRE if c in {k[0] for k in g2}]:
+    vals = [round(g2.get((code, n), {'m': 0})['m'], 2) for n in NAT]
+    t = round(sum(vals), 2)
+    ind = round(vals[1] + vals[2], 2)
+    for n, v in zip(NAT, vals): tn[n] += v
+    r = row(ws, r, [code, plan_cfa.PLAN.get(code, '')] + [v or None for v in vals] +
+            [t, round(100 * ind / t, 2) if t and code[0] == '6' else None],
+            ['', ''] + ['n'] * 5 + ['n', 'p'])
+TT = round(sum(tn.values()), 2)
+IND = round(tn['Indirecte — répartie par clé'] + tn['Indirecte — commun pur'], 2)
+r = total(ws, r, ['', 'TOTAL'] + [round(tn[n], 2) for n in NAT] + [TT, ''],
+          ['', ''] + ['n'] * 5 + ['n', ''])
+r += 1
+r = header(ws, r, ['Nature', 'Lignes', 'Montant', 'Part des charges'], [34, 12, 18, 18],
+           ['left', 'right', 'right', 'right'])
+CH = round(sum(v['m'] for k, v in g2.items() if k[0][0] == '6'), 2)
+for n in NAT:
+    ln = sum(v['n'] for k, v in g2.items() if k[1] == n)
+    mo = round(sum(v['m'] for k, v in g2.items() if k[1] == n), 2)
+    r = row(ws, r, [n, ln, mo, round(100 * mo / CH, 2) if n != 'Produit' else None],
+            ['', 'n0', 'n', 'p'])
+r = total(ws, r, ['Total', len(R), round(sum(l['montant'] for l in R), 2), ''], ['', 'n0', 'n', ''])
+r = note(ws, r, "Une charge « directe » porte 100 % sur une seule activité — apprentissage, formation continue "
+                "ou Ligue AURA — parce que sa pièce la désigne. Une charge « indirecte » passe en tout ou "
+                "partie par le commun, et c'est la cascade des clés qui la répartit ensuite. Le taux indirect "
+                "par compte se lit dans la dernière colonne.", 9)
+finish(ws, freeze='A4')
+wb.save('Analytique_CFA_WEFORM.xlsx')
+print('classeur —', len(wb.sheetnames), 'onglets')

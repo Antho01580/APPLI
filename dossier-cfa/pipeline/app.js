@@ -9,6 +9,7 @@ function fmt(v,blank){
   const s = Math.abs(v).toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,NB);
   return (v<0?'-':'')+s;
 }
+const R2b = v => Math.round(v*100)/100;
 const cls = v => v==null||Math.abs(v)<0.005 ? 'z' : (v<0?'neg':'pos');
 
 /* ---------- sélection des lignes composant un chiffre ---------- */
@@ -60,9 +61,15 @@ function openD(f,title,expected){
   if(f.cle) why.push(`clé <strong>${E(f.cle)}</strong>`);
   if(f.ax!=null) why.push(`part de l'axe <strong>${AXN[f.ax]}</strong>`);
   if(f.note) why.push(f.note);
+  if(f.mod) why.push(f.mod);
   document.getElementById('dwhy').innerHTML = why.length? why.join(' · ') :
     'Toutes les lignes de charges et de produits du grand livre.';
-  document.getElementById('dcheck').innerHTML = f.calc ?
+  document.getElementById('dcheck').innerHTML = f.mod ?
+    `<div><span class="lab">Chiffre affiché — votre modèle</span><span class="val">${fmt(expected)}</span></div>
+     <div><span class="lab">Ce que porte le grand livre</span><span class="val">${fmt(tot)}</span></div>
+     <div><span class="lab">Écart modèle − grand livre</span><span class="val ${Math.abs(tot-expected)<0.02?'ok':''}">${Math.abs(tot-expected)<0.02?'✓ 0,00':fmt(R2b(expected-tot))}</span></div>
+     <div><span class="lab">Lignes de grand livre</span><span class="val">${ix.length}</span></div>` :
+    f.calc ?
     `<div><span class="lab">Chiffre affiché</span><span class="val">${fmt(expected)}</span></div>
      <div><span class="lab">Mode d'obtention</span><span class="val" style="font-size:12.5px;font-weight:500">${E(f.calc)}</span></div>
      <div><span class="lab">Base répartie</span><span class="val">${fmt(tot)}</span></div>

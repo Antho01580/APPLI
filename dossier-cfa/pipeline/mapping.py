@@ -105,6 +105,13 @@ EXCEPTIONS = {
 def compte_cfa(e):
     """Retourne (code CFA, motif) pour une ligne du grand livre."""
     idx = e.get('idx')
+    # 1. corrections établies sur les relevés bancaires (elles priment sur tout)
+    try:
+        import corrections_releves
+        c = corrections_releves.appliquer(dict(e, cfa=DEFAUT.get(e['compte'], e['compte'])))
+        if c: return c[0], c[2]
+    except Exception:
+        pass
     if idx in EXCEPTIONS:
         return EXCEPTIONS[idx]
     c = e['compte']; lib = (e['libelle'] or '').upper()

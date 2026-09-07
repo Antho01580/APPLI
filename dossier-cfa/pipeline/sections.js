@@ -161,25 +161,36 @@ add('4','Par formation',()=>{
 /* ---- 5. par stagiaire ---- */
 add('5','Par stagiaire',()=>{
   let h=head('Par stagiaire — un apprenti par contrat',
-    "Le titre est celui que porte SON contrat. Cliquer sur une charge nominative ouvre les lignes du grand livre dont le libellé cite la personne.");
-  h+=`<div class="tools"><input id="qs" type="search" placeholder="Rechercher un stagiaire…" style="min-width:280px">
+    "Le titre est celui que porte SON contrat. « Durée » est la durée totale du contrat ; « Mois dans l'exercice » n'en retient que la part comprise entre le 17/04/2025 et le 31/07/2026. Cliquer sur une charge nominative ouvre les lignes du grand livre dont le libellé cite la personne.");
+  h+=`<div class="tools"><input id="qs" type="search" placeholder="Rechercher un stagiaire, un titre…" style="min-width:280px">
+      <select id="fs"><option value="">Tous les titres</option>${[...new Set(D.stagiaires.map(s=>s[1]))].sort().map(t=>`<option value="${E(t)}">${E(t)}</option>`).join('')}</select>
       <span class="cnt" id="cnts"></span></div><div class="tw" id="stagwrap"></div>`;
   return h;
 });
 function renderStag(){
-  const q=(document.getElementById('qs')?.value||'').toLowerCase();
-  const S=D.stagiaires.filter(s=>!q||(s[0]+' '+s[1]).toLowerCase().includes(q));
-  document.getElementById('cnts').textContent=`${S.length} stagiaire${S.length>1?'s':''}`;
-  document.getElementById('stagwrap').innerHTML=`<table><thead><tr><th>Stagiaire</th>
-    <th>Titre porté par le contrat</th><th class="n">Code</th><th class="n">Prise en charge</th>
+  const q=(document.getElementById('qs')?.value||'').toLowerCase(),
+        ft=document.getElementById('fs')?.value||'';
+  const S=D.stagiaires.filter(s=>(!ft||s[1]===ft)&&(!q||(s[0]+' '+s[1]+' '+s[2]).toLowerCase().includes(q)));
+  const T=k=>R2(S.reduce((a,s)=>a+(s[k]||0),0));
+  const dur=S.filter(s=>s[5]!=null);
+  document.getElementById('cnts').textContent=
+    `${S.length} contrat${S.length>1?'s':''} · prise en charge ${fmt(T(7))} € · charges nominatives ${fmt(T(8))} €`;
+  document.getElementById('stagwrap').innerHTML=`<table><thead><tr><th>Stagiaire</th><th class="c">Code</th>
+    <th>Intitulé du contrat</th><th class="c">Début</th><th class="c">Fin</th><th class="n">Durée</th>
+    <th class="n">Mois dans l'exercice</th><th class="n">Prise en charge</th>
     <th class="n">Charges nominatives</th><th class="n">Lignes</th></tr></thead><tbody>`+
-    S.slice().sort((a,b)=>a[4]-b[4]).map(s=>{
-      const nom=nameKey(s[0]);
-      return `<tr><td>${E(s[0])}</td><td class="small">${E(s[1])}</td><td class="c mono">${E(s[2])}</td>
-        <td class="n mono">${fmt(s[3],1)}</td>`+
-        cell(s[4],s[4]?{name:nom,note:`lignes du grand livre citant « ${E(s[0])} »`}:null,{blank:1,title:E(s[0])})+
-        `<td class="n z">${s[5]}</td></tr>`;}).join('')+
-    `</tbody></table>`;
+    S.map(s=>`<tr><td>${E(s[0])}</td><td class="c mono">${E(s[1])}</td><td class="small">${E(s[2])}</td>
+        <td class="c mono small">${E(s[3])}</td><td class="c mono small">${E(s[4])}</td>
+        <td class="n mono">${s[5]==null?'·':s[5].toFixed(2).replace('.',',')}</td>
+        <td class="n mono ${s[6]?'':'z'}">${s[6]==null?'·':s[6].toFixed(2).replace('.',',')}</td>
+        <td class="n mono">${fmt(s[7],1)}</td>`+
+        cell(s[8],s[10]&&s[10].length?{idx:s[10],mod:"le montant affiché vient de votre modèle analytique ; les lignes ci-dessous sont celles du grand livre dont le libellé cite cette personne — la comparaison des deux totaux est le contrôle",note:`lignes du grand livre citant « ${E(s[0])} »`}:null,{blank:1,title:E(s[0])})+
+        `<td class="n z">${s[9]}</td></tr>`).join('')+
+    `<tr class="sum"><td>Total — ${S.length} contrats</td><td></td><td></td><td></td><td></td>
+      <td class="n mono">${dur.length?(dur.reduce((a,s)=>a+s[5],0)/dur.length).toFixed(2).replace('.',','):'·'}</td>
+      <td class="n mono">${T(6).toFixed(2).replace('.',',')}</td>
+      <td class="n mono">${fmt(T(7))}</td><td class="n mono">${fmt(T(8))}</td>
+      <td class="n">${S.reduce((a,s)=>a+s[9],0)}</td></tr></tbody></table>`;
   bind();
 }
 function nameKey(n){
@@ -445,6 +456,242 @@ add('14',"Compte d'attente",()=>{
   return h;
 });
 
+/* ---- 15. décompte des stagiaires ---- */
+add('15','Décompte des stagiaires',()=>{
+  const DC=D.decompte, TC=DC.titres_cols;
+  let h=head('Le décompte des stagiaires',
+    "Effectif présent mois par mois, entrées et sorties, durées. Tout est reconstitué depuis les dates de début et de fin portées par chaque contrat.");
+  h+=`<div class="cards">`+DC.reperes.map(([a,b])=>
+    `<div class="card"><span class="lab">${E(a)}</span><span class="big mono">${typeof b==='number'&&!Number.isInteger(b)?b.toFixed(2).replace('.',','):b}</span></div>`).join('')+`</div>`;
+  h+=`<h3 class="sec">Effectif mois par mois</h3><div class="tw"><table><thead><tr><th>Mois</th>
+    <th class="n">Présents</th><th class="n">Entrées</th><th class="n">Sorties</th>`+
+    TC.map(t=>`<th class="n">${E(t)}</th>`).join('')+`</tr></thead><tbody>`;
+  const mx=Math.max(...DC.mensuel.map(m=>m[1]))||1;
+  DC.mensuel.forEach(m=>{
+    h+=`<tr><td class="mono">${E(m[0])}</td>
+      <td class="n mono"><span class="bar" style="--w:${(100*m[1]/mx).toFixed(1)}%">${m[1]}</span></td>
+      <td class="n mono ${m[2]?'':'z'}">${m[2]||'·'}</td><td class="n mono ${m[3]?'':'z'}">${m[3]||'·'}</td>`+
+      TC.map((t,k)=>`<td class="n mono ${m[4+k]?'':'z'}">${m[4+k]||'·'}</td>`).join('')+`</tr>`;
+  });
+  h+=`<tr class="sum"><td>Total des mouvements</td><td class="n">·</td>
+    <td class="n">${DC.mensuel.reduce((a,m)=>a+m[2],0)}</td>
+    <td class="n">${DC.mensuel.reduce((a,m)=>a+m[3],0)}</td>`+TC.map(()=>'<td></td>').join('')+`</tr></tbody></table></div>`;
+  const idxTitre=t=>[...new Set([].concat(...D.stagiaires.filter(s=>s[1]===t).map(s=>s[10]||[])))];
+  h+=`<h3 class="sec">Par titre</h3><div class="tw"><table><thead><tr><th>Titre</th><th class="n">Contrats</th>
+    <th class="n">Prise en charge</th><th class="n">Charges nominatives</th><th class="n">Durée moyenne</th>
+    <th class="n">Mois-apprenti dans l'exercice</th></tr></thead><tbody>`+
+    DC.par_titre.slice().sort((a,b)=>b[2]-a[2]).map(t=>{const ix=idxTitre(t[0]);
+      return `<tr><td class="mono">${E(t[0])}</td><td class="n">${t[1]}</td><td class="n mono">${fmt(t[2],1)}</td>`+
+       cell(t[3],ix.length?{idx:ix,mod:"le montant affiché vient de votre modèle analytique ; les lignes ci-dessous sont celles du grand livre dont le libellé cite cette personne — la comparaison des deux totaux est le contrôle",note:`lignes du grand livre citant un apprenti du titre ${E(t[0])}`}:null,{blank:1,title:`Charges nominatives · ${E(t[0])}`})+
+       `<td class="n mono">${t[4].toFixed(2).replace('.',',')}</td>
+       <td class="n mono">${t[5].toFixed(2).replace('.',',')}</td></tr>`;}).join('')+
+    `<tr class="sum"><td>Total</td><td class="n">${DC.par_titre.reduce((a,t)=>a+t[1],0)}</td>
+      <td class="n mono">${fmt(R2(DC.par_titre.reduce((a,t)=>a+t[2],0)))}</td>
+      <td class="n mono">${fmt(R2(DC.par_titre.reduce((a,t)=>a+t[3],0)))}</td><td class="n">·</td>
+      <td class="n mono">${R2(DC.par_titre.reduce((a,t)=>a+t[5],0)).toFixed(2).replace('.',',')}</td></tr></tbody></table></div>`;
+  h+=note("Le centre ouvre en juillet 2025 avec deux contrats, prend l'essentiel de son effectif en août (36 entrées) "+
+    "et culmine à 67 apprentis présents en mai 2026 — mois où 39 contrats s'achèvent. Les mois-apprenti recalculés "+
+    "depuis les dates donnent 542,92 contre 544,42 au modèle : l'écart de 1,50 vient des conventions de bornes.");
+  return h;
+});
+
+/* ---- 16. courts contrats ---- */
+add('16','Courts contrats',()=>{
+  const C=D.courts;
+  let h=head(`Les contrats de moins de ${C.seuil.toFixed(0)} mois`,
+    "Le seuil se lit dans les données : la durée médiane est de neuf mois, et sous six mois on ne trouve presque que de la formation continue.");
+  h+=`<div class="tw"><table><thead><tr><th>Stagiaire</th><th class="c">Titre</th><th>Intitulé du contrat</th>
+    <th class="c">Début</th><th class="c">Fin</th><th class="n">Durée</th><th class="n">Prise en charge</th>
+    <th class="n">Charges nominatives</th><th class="n">Prise en charge par mois</th></tr></thead><tbody>`+
+    C.contrats.map(c=>`<tr><td>${E(c[0])}</td><td class="c mono">${E(c[1])}</td><td class="small">${E(c[2])}</td>
+      <td class="c mono small">${E(c[3])}</td><td class="c mono small">${E(c[4])}</td>
+      <td class="n mono">${c[5].toFixed(2).replace('.',',')}</td><td class="n mono">${fmt(c[6],1)}</td>`+
+      cell(c[7],c[9]&&c[9].length?{idx:c[9],mod:"le montant affiché vient de votre modèle analytique ; les lignes ci-dessous sont celles du grand livre dont le libellé cite cette personne — la comparaison des deux totaux est le contrôle",note:`lignes du grand livre citant « ${E(c[0])} »`}:null,{blank:1,title:E(c[0])})+
+      `<td class="n mono">${fmt(c[8],1)}</td></tr>`).join('')+
+    `<tr class="sum"><td>Total — ${C.contrats.length} contrats</td><td></td><td></td><td></td><td></td>
+      <td class="n mono">${R2(C.contrats.reduce((a,c)=>a+c[5],0)).toFixed(2).replace('.',',')}</td>
+      <td class="n mono">${fmt(R2(C.contrats.reduce((a,c)=>a+c[6],0)))}</td>
+      <td class="n mono">${fmt(R2(C.contrats.reduce((a,c)=>a+c[7],0)))}</td><td></td></tr></tbody></table></div>`;
+  h+=`<h3 class="sec">La distribution des durées</h3><div class="tw"><table><thead><tr><th>Tranche de durée</th>
+    <th class="n">Contrats</th><th class="n">Prise en charge</th><th class="n">Part</th><th></th></tr></thead><tbody>`;
+  const mxp=Math.max(...C.tranches.map(t=>t[2]));
+  C.tranches.forEach(t=>{
+    h+=`<tr><td>${E(t[0])}</td><td class="n">${t[1]}</td><td class="n mono">${fmt(t[2],1)}</td>
+      <td class="n mono">${(100*t[2]/C.total_pec).toFixed(2).replace('.',',')} %</td>
+      <td style="width:180px"><span class="bar wide" style="--w:${(100*t[2]/mxp).toFixed(1)}%"></span></td></tr>`;
+  });
+  h+=`<tr class="sum"><td>Total</td><td class="n">${C.tranches.reduce((a,t)=>a+t[1],0)}</td>
+    <td class="n mono">${fmt(C.total_pec)}</td><td class="n mono">100,00 %</td><td></td></tr></tbody></table></div>`;
+  h+=note("Dix des douze contrats de moins de six mois sont des actions de formation continue, et le onzième est "+
+    "la sous-traitance BPJEPS de la Ligue AURA. Le court contrat, ici, <em>c'est</em> la formation continue : "+
+    "l'apprentissage tourne autour de neuf mois.");
+  h+=note("<strong>Deux prises en charge méritent un contrôle.</strong> BEDENDO BOUALIA Tony, 17 633,19 € pour "+
+    "dix-huit jours, et HEIDER Matthias, 15 415,00 € pour la même période. Ce sont les deux plus fortes prises "+
+    "en charge de l'exercice rapportées à la durée : 29 886,76 € et 26 127,12 € par mois.",1);
+  return h;
+});
+
+/* ---- 17. rattachement d'exercice ---- */
+add('17',"Rattachement d'exercice",()=>{
+  const RT=D.ratt;
+  let h=head("Ce qui appartient à l'exercice 2",
+    "Quarante contrats sur quatre-vingt-quinze se poursuivent après le 31/07/2026. C'est ce qui fonde les produits constatés d'avance — et, en sens inverse, les produits acquis non encore facturés.");
+  h+=`<div class="tw"><table><thead><tr><th>Écriture de rattachement</th><th class="c">Compte</th>
+    <th class="n">Montant</th><th>Ce qu'elle porte</th></tr></thead><tbody>`+
+    RT.ecritures.map((e,i)=>`<tr${e[1]?'':' class="sum"'}><td>${E(e[0])}</td><td class="c mono">${E(e[1])}</td>`+
+      cell(e[2],RT.idx_ecr[i]&&RT.idx_ecr[i].length?{idx:RT.idx_ecr[i],note:E(e[0])}:null,{title:E(e[0])})+
+      `<td class="small" style="max-width:620px">${E(e[3])}</td></tr>`).join('')+
+    `</tbody></table></div>`;
+  h+=`<h3 class="sec">Les contrats à cheval sur les deux exercices</h3><div class="tw"><table><thead><tr>
+    <th>Stagiaire</th><th class="c">Titre</th><th class="c">Début</th><th class="c">Fin</th><th class="n">Durée</th>
+    <th class="n">Mois sur l'exercice 1</th><th class="n">Mois sur l'exercice 2</th><th class="n">Part exercice 1</th>
+    <th class="n">Prise en charge</th></tr></thead><tbody>`+
+    RT.contrats.map(c=>`<tr><td>${E(c[0])}</td><td class="c mono">${E(c[1])}</td>
+      <td class="c mono small">${E(c[2])}</td><td class="c mono small">${E(c[3])}</td>
+      <td class="n mono">${c[4].toFixed(2).replace('.',',')}</td>
+      <td class="n mono ${c[5]?'':'z'}">${c[5].toFixed(2).replace('.',',')}</td>
+      <td class="n mono">${c[6].toFixed(2).replace('.',',')}</td>
+      <td class="n mono"><span class="bar" style="--w:${c[7].toFixed(1)}%">${c[7].toFixed(2).replace('.',',')} %</span></td>
+      <td class="n mono">${fmt(c[8],1)}</td></tr>`).join('')+
+    `<tr class="sum"><td>Total — ${RT.contrats.length} contrats à cheval</td><td></td><td></td><td></td>
+      <td class="n mono">${R2(RT.contrats.reduce((a,c)=>a+c[4],0)).toFixed(2).replace('.',',')}</td>
+      <td class="n mono">${R2(RT.contrats.reduce((a,c)=>a+c[5],0)).toFixed(2).replace('.',',')}</td>
+      <td class="n mono">${R2(RT.contrats.reduce((a,c)=>a+c[6],0)).toFixed(2).replace('.',',')}</td><td></td>
+      <td class="n mono">${fmt(R2(RT.contrats.reduce((a,c)=>a+c[8],0)))}</td></tr></tbody></table></div>`;
+  h+=note("Les quarante contrats à cheval portent "+fmt(R2(RT.contrats.reduce((a,c)=>a+c[8],0)))+" € de prise en charge, "+
+    "dont une part revient à l'exercice 2. Les 46 427,02 € de produits constatés d'avance sont ceux de votre modèle, "+
+    "calculés contrat par contrat sur l'avancement ; les durées ci-dessus permettent de les recouper. "+
+    "Quatorze contrats commencent le 31/08/2026 : ils ne portent aucun mois sur l'exercice 1, et l'intégralité de "+
+    "leur prise en charge déjà facturée est constatée d'avance.");
+  return h;
+});
+
+/* ---- 18. direct et indirect ---- */
+add('18','Charges directes et indirectes',()=>{
+  const DI=D.dirind, N=DI.natures;
+  const CH=R2(DI.synthese.filter(x=>x[0]!=='Produit').reduce((a,x)=>a+x[2],0));
+  let h=head('Charges directes et charges indirectes',
+    "Une charge est directe quand la pièce désigne l'activité — apprentissage, formation continue, Ligue AURA. Elle est indirecte quand il faut une clé pour la répartir.");
+  h+=`<div class="tw"><table><thead><tr><th>Nature</th><th class="n">Lignes</th><th class="n">Montant</th>
+    <th class="n">Part des charges</th><th></th></tr></thead><tbody>`;
+  const mxs=Math.max(...DI.synthese.filter(x=>x[0]!=='Produit').map(x=>Math.abs(x[2])));
+  DI.synthese.forEach(x=>{
+    h+=`<tr><td>${E(x[0])}</td><td class="n z">${x[1]}</td>`+
+      cell(x[2],{idx:x[3],note:`toutes les lignes de nature « ${E(x[0])} »`},{title:E(x[0])})+
+      `<td class="n mono ${x[0]==='Produit'?'z':''}">${x[0]==='Produit'?'·':(100*x[2]/CH).toFixed(2).replace('.',',')+' %'}</td>
+       <td style="width:180px">${x[0]==='Produit'?'':`<span class="bar wide" style="--w:${(100*Math.abs(x[2])/mxs).toFixed(1)}%"></span>`}</td></tr>`;
+  });
+  h+=`<tr class="sum"><td>Total</td><td class="n">${DI.synthese.reduce((a,x)=>a+x[1],0)}</td>
+    <td class="n mono">${fmt(RES)}</td><td></td><td></td></tr></tbody></table></div>`;
+  h+=`<h3 class="sec">Compte par compte</h3><div class="tw"><table><thead><tr><th>Compte</th><th>Intitulé</th>`+
+    N.map(n=>`<th class="n">${E(n)}</th>`).join('')+`<th class="n">Total</th><th class="n">Taux indirect</th></tr></thead><tbody>`;
+  DI.comptes.forEach(c=>{
+    const vals=c.slice(2), tot=R2(vals.reduce((a,v)=>a+v[0],0)), ind=R2(vals[1][0]+vals[2][0]);
+    h+=`<tr><td class="mono">${E(c[0])}</td><td class="small">${E(c[1])}</td>`+
+      vals.map((v,k)=>cell(v[0],v[1].length?{idx:v[1],note:`${E(c[0])} · ${E(N[k])}`}:null,{blank:1,title:`${E(c[0])} — ${E(N[k])}`})).join('')+
+      `<td class="n mono"><strong>${fmt(tot)}</strong></td>
+       <td class="n mono ${c[0][0]==='6'?'':'z'}">${c[0][0]==='6'&&tot?(100*ind/tot).toFixed(2).replace('.',',')+' %':'·'}</td></tr>`;
+  });
+  h+=`<tr class="sum"><td colspan="2">Total</td>`+
+    N.map((n,k)=>cell(R2(DI.comptes.reduce((a,c)=>a+c[2+k][0],0)),null)).join('')+
+    `<td class="n mono">${fmt(RES)}</td><td></td></tr></tbody></table></div>`;
+  h+=note("Une charge « directe » porte 100 % sur une seule activité parce que sa pièce la désigne : le nom d'un "+
+    "apprenti, l'intitulé d'une action, le nom de la Ligue. Une charge « indirecte » passe en tout ou partie par "+
+    "le commun, et c'est la cascade des clés n° 1 et n° 2 qui la répartit ensuite. La distinction se lit compte "+
+    "par compte dans la dernière colonne : un taux de 0 % désigne un compte entièrement traçable, un taux de "+
+    "100 % un compte de structure.");
+  return h;
+});
+
+/* ---- 19. mes questions ---- */
+add('19','Mes questions',()=>{
+  const CPT=[
+   ["PC BOULANGER du 15/04/2026",-1299.99,
+    "SECOGEST l'immobilise au 2183000. Votre modèle passe en charge le virement de 1 746,44 € du 04/05/2026 qui l'a réglé. Un second PC BOULANGER de juillet est immobilisé des deux côtés.",
+    "Maintenu en immobilisation, comme celui de juillet.",
+    "Ce PC est-il destiné à un apprenti — donc premier équipement, compte 6068 — ou à l'équipe ?"],
+   ["INTERSPORT — six cartes cadeaux de 50 €",-300.00,
+    "SECOGEST les porte au 6234000 « Cadeaux à la clientèle », libellé « INTERSPORT CARTE KDO ». Votre modèle demande le 623.",
+    "Retenu le 623 : la récompense est la contrepartie d'un travail de communication.",
+    "À qui ces six cartes ont-elles été remises — apprentis, clubs partenaires, salariés ? La réponse décide entre 623, 6238 et 6414."],
+   ["PARIS 13 ATLETICO — 4 500 € du 16/11/2025",-4500.00,
+    "Le libellé du grand livre dit « INTERVENTION + LOCATION DE SALLE ». Votre modèle le porte au 6238 « dons, mécénat et relations publiques ».",
+    "Laissé en location (6132.1) : le grand livre fait foi sur les libellés.",
+    "Est-ce une location de salle avec intervention facturée, ou un partenariat ? Si la facture détaille les deux, une part rejoint le 6226."],
+   ["Provision pour congés payés",-8109.75,
+    "Aucune provision au bilan : le 6412000 ne porte que 449,94 € et aucun compte 428 n'existe. Au dixième du brut, les congés acquis non pris représentent environ 8 109,75 € charges comprises. Mais la paie de juillet dépasse celle de juin de 3 921,15 €.",
+    "Non passée : c'est une estimation, et elle ne figurait pas dans les écritures arrêtées.",
+    "Pouvez-vous m'adresser les compteurs de congés au 31/07/2026 ? Et le surcroît de la paie de juillet est-il une indemnité compensatrice ?"],
+   ["Carburant et entretien du véhicule",-1466.10,
+    "Dix-huit lignes sur tout l'exercice au compte d'attente : TOTAL, ESSO, AGIP, CRAUSAZ, STATION CALAO, MIDAS, LAVAGE BRESSAN, VW Bank.",
+    "Laissé au compte d'attente, sans effet sur le résultat.",
+    "Le véhicule appartient-il à la société ou est-il personnel ? S'il est personnel, ces frais relèvent de l'indemnité kilométrique, pas de la charge directe."],
+   ["« INTER COURSES PERSO ? » du 31/03/2026",-154.73,
+    "Le grand livre pose lui-même la question dans son libellé.",
+    "Laissé au compte d'attente.",
+    "Charge de la société, ou dépense personnelle à porter au compte courant d'associé ?"],
+   ["Créances de 99 110,95 € affirmées par le modèle",19358.00,
+    "Le grand livre porte 79 752,95 € de créances au 31/07/2026 (AFDAS 75 874,75 + AKTO 176,20 + OPCO 3 702,00). Les cinq factures AKTO du 28/07 sont couvertes à hauteur de 15 269,60 € par l'encaissement du 27/07 — le modèle compte donc deux fois.",
+    "Retenu les 79 752,95 € du grand livre.",
+    "Si les 99 110,95 € sont exacts, il manque des factures de vente au grand livre. Pouvez-vous me les transmettre ?"],
+   ["Frais d'achat à l'étranger — 73 commissions",-187.07,
+    "Toutes au compte 6275000. Le relevé nomme le marchand derrière chaque commission : BOLT 53,64 · SCORM ALABOS 38,48 · CLAUDE.AI 33,07 · FOXIT 13,59 · ANTHROPIC 13,28 · CANVA 7,42 · 8X8 7,10 · OPENAI 5,77 · et neuf autres. La commission vaut 2,745 % de l'achat.",
+    "Maintenues au 627 « services bancaires » : la commission est un frais de banque, pas le coût de l'outil.",
+    "Souhaitez-vous que je les rattache analytiquement à l'outil qu'elles ont payé ? Le compte comptable ne changerait pas, seul l'axe."]];
+  const ANA=[
+   ["ONEDIRECT — casques, 358,51 € du 18/08/2025",-358.51,
+    "Compte 6064 « fournitures », axe commun. Vous avez précisé que les casques sont pour les formateurs, pas pour les apprentis — ils ne relèvent donc pas du premier équipement (6068).",
+    "Compte confirmé au 6064, axe commun.",
+    "Ces formateurs interviennent-ils sur l'apprentissage, la formation continue, ou les deux ? Cela fixe l'axe."],
+   ["Présentiels — les factures globales",null,
+    "Les factures de location des sites portent un montant global couvrant la salle, l'intervention d'un formateur et les repas des apprentis. Rien sur la facture ne permet de les séparer.",
+    "Tout reste en location (6132.1). Répartir sans document reviendrait à construire une clé que rien n'appuie.",
+    "Pouvez-vous demander des factures rectificatives détaillées ? La part repas rejoindrait le 6257 « restauration et hébergement des apprentis », qui est une ligne de la grille France compétences."],
+   ["AIRBNB HM8DPE — 2 294,08 €",-2294.08,
+    "Hébergement des apprentis, logé dans le lot carte de juillet. Nature reconnue : 6257.",
+    "Reconnu 6257, en attente de pièce.",
+    "Quels apprentis, et pour quelle formation ? Le 6257 se ventile par titre."],
+   ["SCORM ALABOS — deux achats de cours, 700 €",-700.00,
+    "Achats des 02/07 et 18/07/2026, logés dans le lot carte de juillet. Nature reconnue : 6022.2, contenu pédagogique.",
+    "Reconnu 6022.2, en attente de pièce.",
+    "Ces deux modules servent-ils l'apprentissage ou la formation continue ? Les autres achats SCORM de l'exercice sont en FPC."]];
+  const PCS=[
+   ["Le relevé carte de juillet 2026",8275.52,"Le lot « CARTE FACTURETTES CB » du 31/07/2026, en un seul bloc au grand livre. Je l'ai décomposé d'après le détail de juillet de votre modèle et le bouclage est exact au centime — mais c'est une reconstitution."],
+   ["Les notes de frais détaillées de juillet 2026",3397.81,"Deux virements du 20/07/2026 libellés « FRAIS JUILLET RECAP » : Xavier GAUSSENS 2 993,88 € et Stéphanie HOUVENAGHEL 403,93 €. Aucune note détaillée au dossier."],
+   ["Les 48 achats sans facture",2150.28,"Le grand livre les libelle lui-même « PAS DE FACTURE » : restaurants, péages, courses, carburant. Aucun ne dépasse 180 €."],
+   ["Les 8 tickets CB",412.43,"Libellés « TICKET CB » au grand livre : LES ZINCS 176,00 · THE RUCK HOTEL 93,00 · et six autres."],
+   ["GIRAUDIER — 43,38 € du 31/03/2026",43.38,"La seule opération du compte d'attente dont je ne sais rien dire : ni le libellé, ni le relevé, ni votre modèle ne la nomment."],
+   ["Les compteurs de congés au 31/07/2026",null,"Pour chiffrer la provision pour congés payés, aujourd'hui absente du bilan."],
+   ["Les factures rectificatives des présentiels",null,"Pour séparer salle, intervention et repas — et alimenter le 6257."]];
+  let h=head('Mes questions',
+    "Ce que je n'ai pas pu trancher seul. Chaque point porte le constat, ce que j'ai retenu par défaut — donc ce qui est dans le grand livre et la balance en l'état — et la question qui reste.");
+  const bloc=(titre,intro,rows)=>`<h3 class="sec">${titre}</h3><p class="lead">${intro}</p><div class="tw"><table><thead><tr>
+    <th>#</th><th>Sujet</th><th class="n">Montant en jeu</th><th>Le constat</th><th>Ce que j'ai retenu</th><th>Ma question</th></tr></thead><tbody>`+
+    rows.map((r,i)=>`<tr><td class="c mono">${i+1}</td><td><strong>${E(r[0])}</strong></td>
+      <td class="n mono ${r[1]==null?'z':cls(r[1])}">${r[1]==null?'·':fmt(r[1])}</td>
+      <td class="small" style="max-width:400px">${E(r[2])}</td>
+      <td class="small" style="max-width:300px">${E(r[3])}</td>
+      <td class="small q" style="max-width:340px">${E(r[4])}</td></tr>`).join('')+`</tbody></table></div>`;
+  h+=bloc('A. Ce qui déplacerait un compte comptable',
+    "Votre réponse change le compte, donc le grand livre et la balance. En l'absence de réponse, ce qui figure en colonne « Ce que j'ai retenu » reste en place.",CPT);
+  h+=bloc('B. Ce qui déplacerait le rattachement analytique',
+    "Le compte comptable ne bouge pas ; c'est l'axe — apprentissage, formation continue, Ligue AURA, commun — qui dépend de votre réponse.",ANA);
+  h+=`<h3 class="sec">C. Les pièces qu'il me manque</h3>
+    <p class="lead">Le compte d'attente 4710000 reste ouvert à 18 227,40 €. Ces 18 227,40 € améliorent le résultat d'autant : le jour où les pièces arrivent, chaque opération part au compte que je lui ai déjà reconnu — l'imputation est prête, elle attend le justificatif.</p>
+    <div class="tw"><table><thead><tr><th>#</th><th>Pièce demandée</th><th class="n">Montant concerné</th><th>Pourquoi</th></tr></thead><tbody>`+
+    PCS.map((r,i)=>`<tr><td class="c mono">${i+1}</td><td><strong>${E(r[0])}</strong></td>
+      <td class="n mono ${r[1]==null?'z':''}">${r[1]==null?'·':fmt(r[1])}</td>
+      <td class="small" style="max-width:700px">${E(r[2])}</td></tr>`).join('')+
+    `<tr class="sum"><td></td><td>Compte d'attente 4710000 au 31/07/2026</td><td class="n mono">${fmt(R2(D.attente.reduce((a,x)=>a+x[2],0)))}</td>
+      <td class="small">Le détail des 93 opérations figure à l'onglet « Compte d'attente ».</td></tr></tbody></table></div>`;
+  h+=note("<strong>Ce qui est déjà tranché ne revient pas ici.</strong> Les 45 000 € du 24 et 26/07/2025 sont bien un "+
+    "virement interne entre votre compte courant et le compte Opti Pro : les deux jambes se neutralisent au compte 580, "+
+    "aucun effet sur le résultat ni sur l'analytique. Les 34 500 € de rémunération de Stéphanie sont en place (écriture CL-1). "+
+    "Les 500 € de l'auto-école NOUGARET sont rattachés au stagiaire TANDA NATHAN. Les casques ONEDIRECT sont bien au 6064, "+
+    "pas au premier équipement des apprentis.");
+  return h;
+});
+
 /* ================= routeur ================= */
 function head(t,p){return `<div class="head"><p class="eyebrow">WE-FORM · exercice 1 · plan comptable CFA</p><h2>${E(t)}</h2><p>${E(p)}</p></div>`;}
 function note(html,warn){return `<p class="note${warn?' warn':''}">${html}</p>`;}
@@ -456,7 +703,7 @@ function show(i){
   document.querySelectorAll('#nav button').forEach((b,j)=>b.setAttribute('aria-current',j===i?'true':'false'));
   if(SEC[i].k==='3'){['q','fc','fa'].forEach(id=>{const el=document.getElementById(id);
     if(el) el.oninput=el.onchange=()=>{renderDet();}}); renderDet();}
-  if(SEC[i].k==='5'){const el=document.getElementById('qs'); if(el) el.oninput=renderStag; renderStag();}
+  if(SEC[i].k==='5'){['qs','fs'].forEach(id=>{const el=document.getElementById(id); if(el) el.oninput=el.onchange=renderStag;}); renderStag();}
   if(SEC[i].k==='12'){const el=document.getElementById('qm'); if(el) el.oninput=renderMap; renderMap();}
   window.scrollTo(0,0);
 }

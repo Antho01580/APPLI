@@ -15,6 +15,10 @@ def d2s(s):
     j, m, a = s.split('/'); return (a, m, j)
 
 E = json.load(open('gl_cfa.json'))
+import corrections_releves
+for _e in E:                                   # libellé repris quand le relevé nomme un autre tiers
+    _c = corrections_releves.CORR.get(_e.get('idx'))
+    if _c and _c[1]: _e['libelle'] = _c[1]
 EC = cloture.journal(E)
 
 # ---------- 1. lignes du grand-livre CFA ----------------------------------------
@@ -24,7 +28,7 @@ for e in E:
                    'jnl': e['jnl'], 'libelle': e['libelle'], 'debit': e['debit'], 'credit': e['credit'],
                    'lettrage': e['lettrage'], 'aux': e['compte'] if e['section'] != 'GENERAUX' else None,
                    'aux_lib': e['intitule'] if e['section'] != 'GENERAUX' else None,
-                   'src': e['compte'], 'motif': e['motif'], 'ord': e['idx']})
+                   'src': e['compte'], 'motif': e['motif'], 'ord': e['idx'], 'idx': e['idx']})
 for i, x in enumerate(EC):
     lignes.append({'section': x.get('section', 'GENERAUX'), 'cfa': x['cfa'], 'date': x['date'],
                    'piece': x['piece'], 'jnl': x['jnl'], 'libelle': x['libelle'], 'debit': x['debit'],

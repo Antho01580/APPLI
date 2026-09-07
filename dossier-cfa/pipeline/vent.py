@@ -45,6 +45,7 @@ def defauts(V):
     return out
 
 def ventiler():
+    import corrections_releves
     V = match.charger_modele(XLSX)
     DEF = defauts(V)
     lignes = json.load(open('lignes_cfa.json'))
@@ -63,6 +64,9 @@ def ventiler():
             else:
                 l['cle'], pct = DEF.get(l['cfa'], ('Commun (indirect)', [0, 0, 0, 100, 0]))
                 l['origine'] = 'clé par défaut du compte'
+        elif l.get('idx') in corrections_releves.CLES:
+            nom, pct, why = corrections_releves.CLES[l['idx']]
+            l['cle'], l['origine'] = nom, 'motif du relevé bancaire'
         elif mt:
             l['cle'] = mt['cle'] or 'arbitrage nominatif'
             tot = sum(abs(x) for x in mt['axes'])
