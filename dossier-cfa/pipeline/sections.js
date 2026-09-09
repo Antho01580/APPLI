@@ -595,6 +595,29 @@ add('18','Charges directes et indirectes',()=>{
   h+=`<tr class="sum"><td colspan="2">Total</td>`+
     N.map((n,k)=>cell(R2(DI.comptes.reduce((a,c)=>a+c[2+k][0],0)),null)).join('')+
     `<td class="n mono">${fmt(RES)}</td><td></td></tr></tbody></table></div>`;
+  h+=`<h3 class="sec">Notre lecture confrontée à la vôtre</h3>
+    <p class="lead">Votre classeur porte sa propre colonne « Nature ». Elle ne dit pas la même chose que la nôtre, et c'est normal :
+    la vôtre est une déclaration poste par poste, la nôtre se déduit des clés effectivement appliquées à chaque ligne.
+    Le tableau croise les deux — la diagonale est l'accord, tout le reste est à regarder.</p>
+    <div class="tw"><table><thead><tr><th>Notre lecture ↓ · votre modèle →</th>`+
+    DI.nat_modele.map(n=>`<th class="n">${E(n)}</th>`).join('')+`<th class="n">Total</th></tr></thead><tbody>`;
+  DI.croise.forEach(([n,row])=>{
+    const tl=[].concat(...row.map(c=>c[3]));
+    h+=`<tr><td>${E(n)}</td>`+row.map((c,k)=>{
+      const acc = (n==='Directe'&&c[0]==='Directe')||(n.startsWith('Indirecte')&&c[0]==='Indirecte')||
+                  (n==='Produit'&&c[0]==='Produit')||(n==='Hors périmètre'&&c[0]==='Non incorporable');
+      return `<td class="n"${acc?' style="background:var(--teal-p)"':''}>`+
+        (c[1]?num(c[2],{idx:c[3],note:`notre lecture « ${E(n)} », votre modèle « ${E(c[0])} »`},{title:`${E(n)} × ${E(c[0])}`})+
+              `<br><span class="small z">${c[1]} l.</span>`:'<span class="z">·</span>')+`</td>`;}).join('')+
+      `<td class="n mono"><strong>${fmt(R2(row.reduce((a,c)=>a+c[2],0)))}</strong><br><span class="small z">${tl.length} l.</span></td></tr>`;
+  });
+  h+=`</tbody></table></div>`;
+  h+=note("Les cases sur fond clair sont les accords. Les 169 lignes que nous lisons « directes » et que votre modèle "+
+    "déclare « indirectes » sont des charges dont la pièce désigne une activité, mais que votre modèle range en "+
+    "structure ; les 51 lignes en sens inverse sont des charges que vous déclarez directes et que la clé fait "+
+    "pourtant passer par le commun. Aucune des deux lectures n'est fausse : elles ne répondent pas à la même question. "+
+    "Les 319 lignes « non renseignée » sont celles que votre modèle ne porte pas — il est bâti sur le relevé, le grand "+
+    "livre sur les droits constatés.");
   h+=note("Une charge « directe » porte 100 % sur une seule activité parce que sa pièce la désigne : le nom d'un "+
     "apprenti, l'intitulé d'une action, le nom de la Ligue. Une charge « indirecte » passe en tout ou partie par "+
     "le commun, et c'est la cascade des clés n° 1 et n° 2 qui la répartit ensuite. La distinction se lit compte "+

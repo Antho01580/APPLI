@@ -82,6 +82,7 @@ def ventiler():
             j = max(range(4), key=lambda k: abs(b[k]))
             b[j] = round(b[j] + b[4], 2); b[4] = 0.0
         l['axes'] = b
+        l['nature_modele'] = (mt.get('nature') or '') if mt else ''
         l.pop('match', None)
     json.dump(res, open('vent_cfa.json', 'w'), ensure_ascii=False)
     return res

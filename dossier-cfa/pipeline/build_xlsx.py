@@ -745,6 +745,26 @@ for n in NAT:
     r = row(ws, r, [n, ln, mo, round(100 * mo / CH, 2) if n != 'Produit' else None],
             ['', 'n0', 'n', 'p'])
 r = total(ws, r, ['Total', len(R), round(sum(l['montant'] for l in R), 2), ''], ['', 'n0', 'n', ''])
+NATM = ['Directe', 'Indirecte', 'Non incorporable', 'Produit', '(non renseignée)']
+cx = collections.defaultdict(lambda: [0.0, 0])
+for l in R:
+    k = (nature(l), l.get('nature_modele') or '(non renseignée)')
+    cx[k][0] += l['montant']; cx[k][1] += 1
+r += 1
+r = header(ws, r, ['Notre lecture \\ votre modèle'] + NATM + ['Total'],
+           [30] + [17] * len(NATM) + [17], ['left'] + ['right'] * (len(NATM) + 1))
+for n in NAT:
+    vals = [round(cx[(n, nm)][0], 2) for nm in NATM]
+    r = row(ws, r, [n] + [v or None for v in vals] + [round(sum(vals), 2)], [''] + ['n'] * (len(NATM) + 1))
+r = total(ws, r, ['Total'] + [round(sum(cx[(n, nm)][0] for n in NAT), 2) for nm in NATM] +
+          [round(sum(v[0] for v in cx.values()), 2)], [''] + ['n'] * (len(NATM) + 1))
+r = note(ws, r, "Votre classeur porte sa propre colonne « Nature ». Elle ne dit pas la même chose que la nôtre, et "
+                "c'est normal : la vôtre est une déclaration poste par poste, la nôtre se déduit des clés "
+                "effectivement appliquées à chaque ligne. La diagonale est l'accord. Les 169 lignes que nous lisons "
+                "« directes » et que vous déclarez « indirectes » sont des charges dont la pièce désigne une activité "
+                "mais que votre modèle range en structure ; les 51 lignes en sens inverse passent par le commun malgré "
+                "votre déclaration. Les 319 lignes « non renseignée » sont celles que votre modèle ne porte pas — il "
+                "est bâti sur le relevé, le grand livre sur les droits constatés.", 7)
 r = note(ws, r, "Une charge « directe » porte 100 % sur une seule activité — apprentissage, formation continue "
                 "ou Ligue AURA — parce que sa pièce la désigne. Une charge « indirecte » passe en tout ou "
                 "partie par le commun, et c'est la cascade des clés qui la répartit ensuite. Le taux indirect "

@@ -204,12 +204,22 @@ def _nature(l):
 _NAT = ['Directe', 'Indirecte — répartie par clé', 'Indirecte — commun pur', 'Hors périmètre', 'Produit']
 _gn = collections.defaultdict(list)
 for i, l in enumerate(R): _gn[(l['cfa'], _nature(l))].append(i)
+# nature telle que VOTRE modèle la déclare, pour les lignes qu'il porte
+_NATM = ['Directe', 'Indirecte', 'Non incorporable', 'Produit', '(non renseignée)']
+_cx = collections.defaultdict(list)
+for i, l in enumerate(R):
+    _cx[(_nature(l), l.get('nature_modele') or '(non renseignée)')].append(i)
 DIRIND = {
   'natures': _NAT,
   'comptes': [[code, plan_cfa.PLAN.get(code, '')] +
               [[round(sum(R[i]['montant'] for i in _gn.get((code, n), [])), 2),
                 _gn.get((code, n), [])] for n in _NAT]
               for code in plan_cfa.ORDRE if any((code, n) in _gn for n in _NAT)],
+  # croisement : notre lecture (dérivée des clés) × la nature déclarée par votre modèle
+  'nat_modele': _NATM,
+  'croise': [[n, [[nm, len(_cx.get((n, nm), [])),
+                   round(sum(R[i]['montant'] for i in _cx.get((n, nm), [])), 2),
+                   _cx.get((n, nm), [])] for nm in _NATM]] for n in _NAT],
   'synthese': [[n, sum(len(v) for k, v in _gn.items() if k[1] == n),
                 round(sum(R[i]['montant'] for k, v in _gn.items() if k[1] == n for i in v), 2),
                 [i for k, v in _gn.items() if k[1] == n for i in v]] for n in _NAT],

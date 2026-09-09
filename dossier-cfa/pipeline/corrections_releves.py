@@ -35,6 +35,9 @@ CORR = {
 CLES = {
  1845: ('FPC', [0, 100, 0, 0, 0], "Motif du relevé : « APi FPC ». Le virement va directement à BOLT NEW."),
  1944: ('FPC', [0, 100, 0, 0, 0], "Motif du relevé : « Contenu FPC - Vidéo »."),
+ 1942: ('FPC', [0, 100, 0, 0, 0],
+        "Motif du relevé du 23/04/2026 : « Pour BOLTNEW · Développement · application We-Club FPC ». "
+        "Le motif nomme lui-même la formation continue : la ligne y est affectée en totalité."),
  2336: ('FPC', [0, 100, 0, 0, 0], "Motif du relevé : « Contenu FPC - Vidéo »."),
 }
 
